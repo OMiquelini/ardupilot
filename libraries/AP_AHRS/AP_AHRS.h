@@ -373,6 +373,10 @@ public:
     NavEKF3 EKF3;
 #endif
 
+    uint8_t get_active_AHRS_type(void) const {
+        return uint8_t(active_EKF_type());
+    }
+
     // for holding parameters
     static const struct AP_Param::GroupInfo var_info[];
 

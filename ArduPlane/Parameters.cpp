@@ -1253,7 +1253,11 @@ const AP_Param::GroupInfo ParametersG2::var_info[] = {
     // @User: Standard
     AP_GROUPINFO("AUTOTUNE_AXES", 34, ParametersG2, axis_bitmask, 7),
 
-
+#if HAL_GROUND_EFFECT_ENABLED
+    // @Group: GNDEF_
+    // @Path: ../libraries/AP_GroundEffectControl/GroundEffectController.cpp
+    AP_SUBGROUPINFO(ground_effect_controller, "GNDEF", 33, ParametersG2, GroundEffectController),
+#endif
     
     AP_GROUPEND
 };

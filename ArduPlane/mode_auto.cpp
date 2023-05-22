@@ -104,6 +104,15 @@ void ModeAuto::update()
         plane.nav_pitch_cd = ahrs.pitch_sensor;
         SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, plane.nav_scripting.throttle_pct);
 #endif
+#if HAL_GROUND_EFFECT_ENABLED
+    } else if (nav_cmd_id == MAV_CMD_NAV_WAYPOINT_GROUND_EFFECT) {
+        plane.g2.ground_effect_controller.update();
+        SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, plane.g2.ground_effect_controller.get_throttle());
+        plane.nav_pitch_cd = plane.g2.ground_effect_controller.get_pitch();
+        plane.calc_nav_roll();
+        uint32_t roll_limit_cd = plane.g2.ground_effect_controller.get_auto_lim_roll_cd();
+        plane.nav_roll_cd = constrain_int32(plane.nav_roll_cd, -roll_limit_cd, roll_limit_cd);
+#endif
     } else {
         // we are doing normal AUTO flight, the special cases
         // are for takeoff and landing

@@ -570,6 +570,10 @@ public:
 
     // just to make compilation easier when all things are compiled out...
     uint8_t unused_integer;
+
+    #if HAL_GROUND_EFFECT_ENABLED
+    GroundEffectController ground_effect_controller;
+    #endif
 };
 
 extern const AP_Param::Info var_info[];

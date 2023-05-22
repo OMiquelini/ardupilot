@@ -1,0 +1,10 @@
+[New Thread 57688.0x124c0]
+[New Thread 57688.0x12b44]
+[New Thread 57688.0x1271c]
+[New Thread 57688.0x12a80]
+[New Thread 57688.0x122e4]
+[New Thread 57688.0x10464]
+warning: cannot close "ap-8196.core": invalid operation
+/tmp/gdb.8196:2: Error in sourced command file:
+Can't create a corefile
+[Inferior 1 (process 57688) detached]
