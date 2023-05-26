@@ -43,9 +43,8 @@ rc 2 1450
 
 #pragma once
 
-#include "SIM_config.h"
+#include "SIM_PS_RPLidar.h"
 
-#if HAL_SIM_PS_RPLIDARA2_ENABLED
 
 namespace SITL {
 
@@ -56,4 +55,3 @@ public:
 };
 
 }
-#endif // HAL_SIM_PS_RPLIDARA2_ENABLED
