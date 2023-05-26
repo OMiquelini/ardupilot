@@ -430,9 +430,10 @@ bool RC_Channel_Plane::do_aux_function(const aux_func_t ch_option, const AuxSwit
 
     #if HAL_GROUND_EFFECT_ENABLED
         case AUX_FUNC::GROUND_EFFECT:
-            if(!plane.g2.ground_effect_controller.user_request_enable(ch_flag == AuxSwitchPos::HIGH)){
-                gcs().send_text(MAV_SEVERITY_NOTICE, "GND EFFECT FAILED");
-            }
+
+        if(!plane.g2.ground_effect_controller.user_request_enable(ch_flag == AuxSwitchPos::HIGH)){
+            gcs().send_text(MAV_SEVERITY_NOTICE, "GND EFFECT FAILED");
+        }
             break;
     #endif
 

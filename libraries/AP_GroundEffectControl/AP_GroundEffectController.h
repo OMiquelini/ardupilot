@@ -56,7 +56,7 @@ private:
     AP_Float _CUTOFF_FREQ;
     AP_Float _LIM_ROLL;
 
-    AP_PIDInfo/*AP_Logger::PID_Info*/ _pid_info;
+    AP_PIDInfo _pid_info;
 
     uint32_t _last_time_called;
 
