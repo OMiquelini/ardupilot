@@ -26,106 +26,79 @@ extern const AP_HAL::HAL& hal;
 constexpr uint32_t RESET_TIMEOUT_MICROS{1000000};
 
 const AP_Param::GroupInfo GroundEffectController::var_info[] = {
-    // @Param: ENABLE
+    // @Param: _ENABLE
     // @DisplayName: Is the ground effect controller available or not
     // @Description: Toggles the ground effect controller availability on and off
     // @Values: 0:Disable,1:Enable
     // @User: Advanced
-    AP_GROUPINFO_FLAGS("_ENABLE", 1, GroundEffectController, _ACTIVE, 0, AP_PARAM_FLAG_ENABLE),
+    AP_GROUPINFO_FLAGS("_ENABLE", 1, GroundEffectController, _ACTIVE, AP_PARAM_FLAG_ENABLE, 0),
 
-    // @Param: P
+    // @Param: _throttle_pid_P
     // @DisplayName: P gain
     // @Description: P gain. A 1 meter error from desired alt changes throttle by this many percent.
     // @Range: 0.0 200.0
     // @User: Standard
-
-    // @Param: I
-    // @DisplayName: I gain
-    // @Description: I gain
-    // @User: Standard
-
-    // @Param: D
-    // @DisplayName: D gain
-    // @Description: D gain
-    // @User: Standard
-
-    // @Param: IMAX
-    // @DisplayName: IMax
-    // @Description: Maximum integrator value
-    // @User: Standard
     AP_SUBGROUPINFO(_throttle_pid, "_THR_", 2, GroundEffectController, PID),
 
-    // @Param: P
+    // @Param: _pitch_pid_P
     // @DisplayName: P gain
     // @Description: P gain. A 1 meter error from desired alt changes sets the vehicle pitch to this value.
     // @User: Standard
-
-    // @Param: I
-    // @DisplayName: I gain
-    // @Description: I gain
-    // @User: Standard
-
-    // @Param: D
-    // @DisplayName: D gain
-    // @Description: D gain
-    // @User: Standard
-
-    // @Param: IMAX
-    // @DisplayName: IMax
-    // @Description: Maximum integrator value
-    // @User: Standard
     AP_SUBGROUPINFO(_pitch_pid, "_PITCH_", 3, GroundEffectController, PID),
 
-	// @Param: THR_REF
-	// @DisplayName: Ground Effect desired throttle (percentage)
-	// @Description:
-	// @Range: 0.0 100.0
-	// @Increment: 0.01
+    // @Param: _THR_REF
+    // @DisplayName: Ground Effect desired throttle (percentage)
+    // @Description:
+    // @Range: 0.0 100.0
+    // @Increment: 0.01
     // @User: Standard
-	AP_GROUPINFO("_THR_REF",   4, GroundEffectController, _THR_REF,   35.0),
+    AP_GROUPINFO("_THR_REF", 4, GroundEffectController, _THR_REF, 35.0),
 
-	// @Param: THR_MIN
-	// @DisplayName: Ground Effect minimum throttle (percentage)
-	// @Description:
-	// @Range: 0.0 100.0
-	// @Increment: 0.01
+    // @Param: _THR_MIN
+    // @DisplayName: Ground Effect minimum throttle (percentage)
+    // @Description:
+    // @Range: 0.0 100.0
+    // @Increment: 0.01
     // @User: Standard
-	AP_GROUPINFO("_THR_MIN",   5, GroundEffectController, _THR_MIN,   20.0),
+    AP_GROUPINFO("_THR_MIN", 5, GroundEffectController, _THR_MIN, 20.0),
 
-    // @Param: THR_MAX
-	// @DisplayName: Ground Effect maximum throttle (percentage)
-	// @Description:
-	// @Range: 0.0 100.0
-	// @Increment: 0.01
+    // @Param: _THR_MAX
+    // @DisplayName: Ground Effect maximum throttle (percentage)
+    // @Description:
+    // @Range: 0.0 100.0
+    // @Increment: 0.01
     // @User: Standard
-	AP_GROUPINFO("_THR_MAX",   6, GroundEffectController, _THR_MAX,   50.0),
+    AP_GROUPINFO("_THR_MAX", 6, GroundEffectController, _THR_MAX, 50.0),
 
-	// @Param: ALT_REF
-	// @DisplayName: Ground Effect desired altitude (meters)
-	// @Description:
-	// @Range: 0.0 1.0
-	// @Increment: 0.01
+    // @Param: _ALT_REF
+    // @DisplayName: Ground Effect desired altitude (meters)
+    // @Description:
+    // @Range: 0.0 1.0
+    // @Increment: 0.01
     // @User: Standard
-	AP_GROUPINFO("_ALT_REF",   7, GroundEffectController, _ALT_REF,   0.45),
+    AP_GROUPINFO("_ALT_REF", 7, GroundEffectController, _ALT_REF, 0.45),
 
-	// @Param: CUTOFF_FREQ
-	// @DisplayName: Rangefinder Complementary Filter Cutoff Frequency
-	// @Description: Lower values will trust the rangefinder less.
-	// @Range: 0.0 2.0
-	// @Increment: 0.01
+    // @Param: _CUTOFF_FRQ
+    // @DisplayName: Rangefinder Complementary Filter Cutoff Frequency
+    // @Description: Lower values will trust the rangefinder less.
+    // @Range: 0.0 2.0
+    // @Increment: 0.01
     // @User: Advanced
-	AP_GROUPINFO("_CUTOFF_FRQ",   8, GroundEffectController, _CUTOFF_FREQ,   0.1),
+    AP_GROUPINFO_FLAGS("_CUTOFF_FRQ", 8, GroundEffectController, _CUTOFF_FREQ, 0.1, 0),
 
-	// @Param: LIM_ROLL
-	// @DisplayName: Max roll angle (degrees)
-	// @Description: Max roll allowed in auto mode while going towards a ground effect waypoint. 0 to disable.
-	// @Range: 0.0 45.0
-	// @Increment: 0.01
+    // @Param: _LIM_ROLL
+    // @DisplayName: Max roll angle (degrees)
+    // @Description: Max roll allowed in auto mode while going towards a ground effect waypoint. 0 to disable.
+    // @Range: 0.0 45.0
+    // @Increment: 0.01
     // @User: Advanced
-	AP_GROUPINFO("_LIM_ROLL",   9, GroundEffectController, _LIM_ROLL,   10.0),
+    AP_GROUPINFO("_LIM_ROLL", 9, GroundEffectController, _LIM_ROLL, 10.0),
 
     AP_GROUPEND
 };
+
+
+
 
 bool GroundEffectController::user_request_enable(bool enable)
 {
