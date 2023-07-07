@@ -31,7 +31,7 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     // @Description: Toggles the ground effect controller availability on and off
     // @Values: 0:Disable,1:Enable
     // @User: Advanced
-    AP_GROUPINFO_FLAGS("_ENABLE", 1, GroundEffectController, _ACTIVE, AP_PARAM_FLAG_ENABLE, 0),
+    AP_GROUPINFO_FLAGS("_ENABLE", 1, GroundEffectController, _ACTIVE,0 , AP_PARAM_FLAG_ENABLE),
 
     // @Param: _throttle_pid_P
     // @DisplayName: P gain
@@ -103,12 +103,11 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
 bool GroundEffectController::user_request_enable(bool enable)
 {
     if(enable){
-        if(!_ACTIVE || !_rangefinder->has_orientation(ROTATION_PITCH_270)){
+        if(!_ACTIVE || !_rangefinder->has_orientation(ROTATION_PITCH_270)){//era: if(!_ACTIVE || !_rangefinder->has_orientation(ROTATION_PITCH_270))
             _enabled = false;
             return false;
         }
     }
-
     _enabled = enable;
     return true;
 }

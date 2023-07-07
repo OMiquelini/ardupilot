@@ -57,6 +57,9 @@
 #include <AP_Logger/AP_Logger.h>
 #include <AP_SerialManager/AP_SerialManager.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
+#include <AP_AHRS/AP_AHRS.h>
+
+AP_AHRS* _ahrs;
 
 extern const AP_HAL::HAL &hal;
 
@@ -638,7 +641,7 @@ float RangeFinder::distance_orient(enum Rotation orientation) const
     if (backend == nullptr) {
         return 0;
     }
-    return backend->distance();
+    return backend->distance();//tentativa de correção
 }
 
 uint16_t RangeFinder::distance_cm_orient(enum Rotation orientation) const

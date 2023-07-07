@@ -627,15 +627,20 @@ void Plane::rangefinder_terrain_correction(float &height)
 void Plane::rangefinder_height_update(void)
 {
     float distance = rangefinder.distance_orient(ROTATION_PITCH_270);
-    
+    Vector3f pos_offset=rangefinder.get_pos_offset_orient(ROTATION_PITCH_270);//pos offset
+    //hal.console->printf("correction = %f\n",ahrs.get_rotation_body_to_ned().c.z-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch());
+    //hal.console->printf("offset=%f\n",ahrs.sin_pitch()*pos_offset.x);
+    //hal.console->printf("measure = %f\n",distance);
+    //hal.console->printf("distance = %f\n",(distance*ahrs.get_rotation_body_to_ned().c.z)-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch());
+
     if ((rangefinder.status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good) && ahrs.home_is_set()) {
         if (!rangefinder_state.have_initial_reading) {
             rangefinder_state.have_initial_reading = true;
             rangefinder_state.initial_range = distance;
         }
-        // correct the range for attitude (multiply by DCM.c.z, which
-        // is cos(roll)*cos(pitch))
-        rangefinder_state.height_estimate = distance * ahrs.get_rotation_body_to_ned().c.z;
+        //add body rotation and rangefinder position offset correction
+        rangefinder_state.height_estimate = (distance* ahrs.get_rotation_body_to_ned().c.z)-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch();
+        //hal.console->printf("estimate = %f\n",rangefinder_state.height_estimate);
 
         rangefinder_terrain_correction(rangefinder_state.height_estimate);
 

@@ -12,8 +12,14 @@ void ModeFBWA::update()
     } else {
         plane.nav_pitch_cd = -(pitch_input * plane.pitch_limit_min_cd);
     }
-    #if HAL_GROUND_EFFECT_ENABLED    
-    if(plane.g2.ground_effect_controller.enabled_by_user()){
+    #if HAL_GROUND_EFFECT_ENABLED
+    //leitura do canal do rádio configurado para aux_func efeito solo (175)
+    RC_Channel *chan_gndef = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GROUND_EFFECT);
+    //verifica se o canal está configurado para efeito solo
+    bool gndef_mode = chan_gndef->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+    printf("gndef: %d\n", (int)gndef_mode);
+    //se chave estiver para baixo, realiza o voo em efeito solo, do contrario, voa com fbwa normalmente
+    if(gndef_mode){
         plane.g2.ground_effect_controller.update();
         // If the rc throttle input is zero (within dead zone), supress throttle
         // This allows the user to stop flight by reflexively cutting the throttle
@@ -23,6 +29,7 @@ void ModeFBWA::update()
             SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, plane.g2.ground_effect_controller.get_throttle());
         }
         plane.nav_pitch_cd += plane.g2.ground_effect_controller.get_pitch(); // Note that this stacks
+        printf("###elevator: %f, elevator_gndef: %f###\n",(float)(plane.nav_pitch_cd),(float)(plane.g2.ground_effect_controller.get_pitch()));
     } else {
     #endif
         plane.adjust_nav_pitch_throttle();
