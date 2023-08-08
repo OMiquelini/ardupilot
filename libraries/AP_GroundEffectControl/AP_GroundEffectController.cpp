@@ -130,7 +130,6 @@ int32_t GroundEffectController::get_auto_lim_roll_cd()
     return int32_t(_LIM_ROLL*100.0);
 }
 
-
 void GroundEffectController::update()
 {
     uint32_t time = AP_HAL::micros();
@@ -147,9 +146,9 @@ void GroundEffectController::update()
     float alt_error, ahrs_negative_alt;
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
         _altFilter.apply(_last_good_rangefinder_reading, -ahrs_negative_alt, time);
-        alt_error = _ALT_REF - _altFilter.get();
+        alt_error = _ALT_REF - _altFilter.get() + alt_adjust;
     } else {
-        alt_error = _ALT_REF - _last_good_rangefinder_reading;
+        alt_error = _ALT_REF - _last_good_rangefinder_reading + alt_adjust;
 
     }
 
@@ -157,6 +156,12 @@ void GroundEffectController::update()
     _throttle = _throttle_pid.get_pid(alt_error) + _THR_REF;
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
 
+    return;
+}
+
+void GroundEffectController::altitude_adjustment(float ref)
+{
+    alt_adjust = ref*0.5;
     return;
 }
 

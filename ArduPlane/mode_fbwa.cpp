@@ -20,6 +20,10 @@ void ModeFBWA::update()
     bool gndef_mode = chan_gndef->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;    
     //se a chave estiver para baixo, realiza o voo em efeito solo, do contrario, voa com fbwa normalmente
     if(gndef_mode){
+        RC_Channel *chan_pot = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
+        float pot_input = chan_pot->norm_input_ignore_trim();
+        plane.g2.ground_effect_controller.altitude_adjustment(pot_input);
+        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"Altitude correction %f",pot_input*0.5);
         plane.g2.ground_effect_controller.update();
         if (message_sent==false)
         {
@@ -32,10 +36,8 @@ void ModeFBWA::update()
         } else {
             float gnd_throttle=plane.g2.ground_effect_controller.get_throttle();
             SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, gnd_throttle);
-            //GCS_SEND_TEXT(MAV_SEVERITY_INFO,"###throttle_gndef: %f###\n",gnd_throttle);
         }
         plane.nav_pitch_cd += plane.g2.ground_effect_controller.get_pitch(); // Note that this stacks
-        //GCS_SEND_TEXT(MAV_SEVERITY_INFO,"###elevator: %f, elevator_gndef: %f###\n",(float)(plane.nav_pitch_cd),(float)(plane.g2.ground_effect_controller.get_pitch()));
     } else {
     #endif
         plane.adjust_nav_pitch_throttle();

@@ -32,9 +32,13 @@ public:
 
     void update();
 
+    void altitude_adjustment(float ref);
+
 	void reset();
 
-    const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; } //AP_Logger::PID_Info& get_pid_info(void) const { return _pid_info; }
+    float alt_adjust=0;
+
+    const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
 
 	static const struct AP_Param::GroupInfo var_info[];
 
