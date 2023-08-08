@@ -243,11 +243,13 @@ public:
         CAMERA_MANUAL_FOCUS = 168,// camera manual focus.  high = long shot, middle = stop focus, low = close shot
         CAMERA_AUTO_FOCUS =  169, // camera auto focus
         QSTABILIZE =         170, // QuadPlane QStabilize mode
-        MAG_CAL =            171, // Calibrate compasses (disarmed only)
-        BATTERY_MPPT_ENABLE = 172,// Battery MPPT Power enable. high = ON, mid = auto (controlled by mppt/batt driver), low = OFF. This effects all MPPTs.
+        MAG_CAL                 = 171, // Calibrate compasses (disarmed only)
+        BATTERY_MPPT_ENABLE     = 172,// Battery MPPT Power enable. high = ON, mid = auto (controlled by mppt/batt driver), low = OFF. This effects all MPPTs.
         PLANE_AUTO_LANDING_ABORT = 173, // Abort Glide-slope or VTOL landing during payload place or do_land type mission items
-        CAMERA_IMAGE_TRACKING = 174, // camera image tracking
-        GROUND_EFFECT      = 175, // Use ground effect controller in FBWA
+        CAMERA_IMAGE_TRACKING   = 174, // camera image tracking
+        GROUND_EFFECT           = 175, // Use ground effect controller in FBWA
+        GNDEF_CHNG_ALT_REF      = 176, // Use switch to save new altitude as alt_ref
+        GNDEF_POT_ALT           = 177, // Use radio signal to 
 
 
         // inputs from 200 will eventually used to replace RCMAP

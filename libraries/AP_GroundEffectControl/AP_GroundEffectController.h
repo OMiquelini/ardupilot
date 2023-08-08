@@ -32,6 +32,8 @@ public:
 
     void update();
 
+    float change_alt_ref(bool active);
+
 	void reset();
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; } //AP_Logger::PID_Info& get_pid_info(void) const { return _pid_info; }
@@ -46,7 +48,7 @@ public:
 
 private:
     PID _pitch_pid{120.0, 0.0, 0.0, 1000};
-    PID _throttle_pid{64, 0.0, 20.0, 1000};
+    PID _throttle_pid{64, 0.0, 0.0, 1000};
 
     AP_Int8 _ACTIVE;
 	AP_Float _THR_REF;

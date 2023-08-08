@@ -14,7 +14,9 @@
  */
 
 #include "Plane.h"
+#include <AP_RangeFinder/AP_RangeFinder.h>
 
+RangeFinder *_rangefinder;
 /*
   altitude handling routines. These cope with both barometric control
   and terrain following control
@@ -166,6 +168,17 @@ void Plane::set_target_altitude_current(void)
         // terrain altitude when we set the altitude then don't
         // terrain follow
         target_altitude.terrain_following = false;        
+    }
+#endif
+#if HAL_GROUND_EFFECT_ENABLED 
+    //leitura do canal do rádio configurado para aux_func efeito solo (175)
+    RC_Channel *chan_gndef = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GROUND_EFFECT);
+    //verifica se o canal está configurado para efeito solo
+    bool gndef_mode = chan_gndef->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+    if(gndef_mode && _rangefinder->status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good)
+    {
+        // if we are in ground effect mode, set the target altitude to the current altitude
+        target_altitude.amsl_cm = _rangefinder->distance_orient(ROTATION_PITCH_270);
     }
 #endif
 }
@@ -628,10 +641,10 @@ void Plane::rangefinder_height_update(void)
 {
     float distance = rangefinder.distance_orient(ROTATION_PITCH_270);
     Vector3f pos_offset=rangefinder.get_pos_offset_orient(ROTATION_PITCH_270);//pos offset
-    //hal.console->printf("correction = %f\n",ahrs.get_rotation_body_to_ned().c.z-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch());
-    //hal.console->printf("offset=%f\n",ahrs.sin_pitch()*pos_offset.x);
-    //hal.console->printf("measure = %f\n",distance);
-    //hal.console->printf("distance = %f\n",(distance*ahrs.get_rotation_body_to_ned().c.z)-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch());
+    //printf("correction = %f\n",ahrs.get_rotation_body_to_ned().c.z-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch());
+    //printf("offset=%f\n",ahrs.sin_pitch()*pos_offset.x);
+    //printf("measure = %f\n",distance);
+    //printf("distance = %f\n",(distance*ahrs.get_rotation_body_to_ned().c.z)-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch());
 
     if ((rangefinder.status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good) && ahrs.home_is_set()) {
         if (!rangefinder_state.have_initial_reading) {
@@ -640,7 +653,7 @@ void Plane::rangefinder_height_update(void)
         }
         //add body rotation and rangefinder position offset correction
         rangefinder_state.height_estimate = (distance* ahrs.get_rotation_body_to_ned().c.z)-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch();
-        //hal.console->printf("estimate = %f\n",rangefinder_state.height_estimate);
+        printf("estimate = %f\n",rangefinder_state.height_estimate);
 
         rangefinder_terrain_correction(rangefinder_state.height_estimate);
 

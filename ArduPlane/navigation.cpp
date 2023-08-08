@@ -375,11 +375,11 @@ void Plane::update_loiter(uint16_t radius)
 void Plane::update_fbwb_speed_height(void)
 {
     uint32_t now = micros();
-    if (now - target_altitude.last_elev_check_us >= 100000) {
+    if (now - target_altitude.last_elev_check_us >= 10000) {
         // we don't run this on every loop as it would give too small granularity on quadplanes at 300Hz, and
         // give below 1cm altitude change, which would result in no climb or descent
         float dt = (now - target_altitude.last_elev_check_us) * 1.0e-6;
-        dt = constrain_float(dt, 0.1, 0.15);
+        dt = constrain_float(dt, 0.01, 0.015);
 
         target_altitude.last_elev_check_us = now;
 

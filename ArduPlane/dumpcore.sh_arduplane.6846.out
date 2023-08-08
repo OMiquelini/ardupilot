@@ -1,0 +1,14 @@
+[New Thread 51660.0xc4f0]
+[New Thread 51660.0x6534]
+[New Thread 51660.0x2120]
+[New Thread 51660.0x84ec]
+[New Thread 51660.0xb918]
+[New Thread 51660.0xd0dc]
+[New Thread 51660.0xd22c]
+[New Thread 51660.0x3610]
+[New Thread 51660.0xcf78]
+[New Thread 51660.0x91f4]
+warning: cannot close "ap-6854.core": invalid operation
+/tmp/gdb.6854:2: Error in sourced command file:
+Can't create a corefile
+[Inferior 1 (process 51660) detached]
