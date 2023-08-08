@@ -18,8 +18,6 @@
 #include <AP_HAL/AP_HAL.h>
 #include "AP_GroundEffectController.h"
 #include <AP_AHRS/AP_AHRS.h>
-#include <RC_Channel/RC_Channel.h>
-#include <GCS_MAVLink/GCS.h>
 
 extern const AP_HAL::HAL& hal;
 
@@ -132,27 +130,6 @@ int32_t GroundEffectController::get_auto_lim_roll_cd()
     return int32_t(_LIM_ROLL*100.0);
 }
 
-float GroundEffectController::change_alt_ref(bool active)
-{
-    if(active)
-    {
-        float new_ref;
-        if(_rangefinder->status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good) {
-            _last_good_rangefinder_reading = _rangefinder->distance_orient(ROTATION_PITCH_270);
-            RC_Channel *chan = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_CHNG_ALT_REF);
-            new_ref=_last_good_rangefinder_reading+(200*chan->norm_input_ignore_trim());
-        }
-        else
-        {
-            return _ALT_REF;
-        }
-        return new_ref;
-    }
-    else
-    {
-        return _ALT_REF;
-    }
-}
 
 void GroundEffectController::update()
 {
@@ -166,17 +143,13 @@ void GroundEffectController::update()
         _last_good_rangefinder_reading = _rangefinder->distance_orient(ROTATION_PITCH_270);
     }
 
-    RC_Channel *chan_gndef_alt_ref = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_CHNG_ALT_REF);
-    //verifica se o canal está configurado para efeito solo
-    bool gndef_alt_ref = chan_gndef_alt_ref->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
-
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     float alt_error, ahrs_negative_alt;
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
         _altFilter.apply(_last_good_rangefinder_reading, -ahrs_negative_alt, time);
-        alt_error = change_alt_ref(gndef_alt_ref) - _altFilter.get();
+        alt_error = _ALT_REF - _altFilter.get();
     } else {
-        alt_error = change_alt_ref(gndef_alt_ref) - _last_good_rangefinder_reading;
+        alt_error = _ALT_REF - _last_good_rangefinder_reading;
 
     }
 

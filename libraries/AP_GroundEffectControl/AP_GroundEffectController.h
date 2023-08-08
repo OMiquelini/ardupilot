@@ -32,8 +32,6 @@ public:
 
     void update();
 
-    float change_alt_ref(bool active);
-
 	void reset();
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; } //AP_Logger::PID_Info& get_pid_info(void) const { return _pid_info; }
