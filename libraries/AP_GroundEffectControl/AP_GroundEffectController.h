@@ -59,6 +59,7 @@ private:
     AP_Float _ALT_REF;
     AP_Float _CUTOFF_FREQ;
     AP_Float _LIM_ROLL;
+    AP_Float _AIMED_AIRSPEED;
 
     AP_PIDInfo _pid_info;
 
@@ -73,6 +74,7 @@ private:
     bool _enabled;
     int32_t _pitch;
     int16_t _throttle;
+
 };
 
 #endif // HAL_GROUND_EFFECT_ENABLED

@@ -23,7 +23,8 @@ void ModeFBWA::update()
 
     //se a chave estiver para baixo, realiza o voo em efeito solo, do contrario, voa com fbwa normalmente
     if(gndef_mode){
-        //ajuste de altura de referencia com input do piloto
+        
+        //ajuste de altura de referencia com input do piloto (176)
         RC_Channel *chan_pot = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
         float pot_input = chan_pot->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.altitude_adjustment(pot_input);

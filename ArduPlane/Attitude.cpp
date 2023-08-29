@@ -658,5 +658,41 @@ void Plane::update_load_factor(void)
         }
         nav_roll_cd = constrain_int32(nav_roll_cd, -roll_limit, roll_limit);
         roll_limit_cd = MIN(roll_limit_cd, roll_limit);
-    }    
+    }  
+}
+
+void Plane::calc_throttle_aeroriver()
+{
+
+
+/*  velocidade atual em m/s
+    float airspeed_measured = 0.1;
+    ahrs.airspeed_estimate(airspeed_measured) //o retorno nesta linha é true se for possivel obter a velocidade, e o valor fica no arispeed_measured
+
+
+    obter o erro para a velocidade desejada
+    definir airspeed_objetivo em algum lugar como um parametro que possa ser ajustado
+    airspeed_error = airspeed_objetivo - airspeed_measured;
+
+    ------ EXEMPLO ---------
+    (controladora de velocidade)
+    fazer o codigo para gerar a saida de throttle requerido, na variavel commanded_throttle
+    commanded_throttle vai de 0 até 100, pode chegar a -100 para reverso, porem nao é necessario por enquanto
+
+    EXEMPLO
+    obter throttle atual comandado
+    throttle_atual_recebido_do_radiocontrole = throttle_percentage()
+
+    calcular thtottle requerido
+    commanded_throttle = throttle_atual_recebido_do_radiocontrole + erro*ganho_proporcional
+
+    restringir throttle a um minimo e maximo, pode ser 0 e 100, ou algo intermediario
+    commanded_throttle = constrain_float(commanded_throttle, throttle_maximo_desejado, throttle_minimo_desejado);
+
+    preferivelmente chamar um PID do propio ardupilot, ou fazer uma melhor controladora do que esse exemplo
+    ------ EXEMPLO ---------
+
+    enviar a saida de throttle para o canal do motor.
+    SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, commanded_throttle);
+*/
 }

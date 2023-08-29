@@ -94,6 +94,12 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("_LIM_ROLL", 9, GroundEffectController, _LIM_ROLL, 10.0),
 
+    // @Param: _AIRSPEED
+    // @DisplayName: Airspeed Aimed
+    // @Description:
+    // @Range: 1.0  15.0
+    AP_GROUPINFO("_AIRSPEED", 10, GroundEffectController, _AIMED_AIRSPEED, 7.0),
+
     AP_GROUPEND
 };
 
@@ -103,7 +109,7 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
 bool GroundEffectController::user_request_enable(bool enable)
 {
     if(enable){
-        if(!_ACTIVE || !_rangefinder->has_orientation(ROTATION_PITCH_270)){//era: if(!_ACTIVE || !_rangefinder->has_orientation(ROTATION_PITCH_270))
+        if(!_ACTIVE || !_rangefinder->has_orientation(ROTATION_PITCH_270)){
             _enabled = false;
             return false;
         }
@@ -142,18 +148,26 @@ void GroundEffectController::update()
         _last_good_rangefinder_reading = _rangefinder->distance_orient(ROTATION_PITCH_270);
     }
 
+    float alt_error, ahrs_negative_alt, airspeed_measured = 0.1, airspeed_error = 0;
+
+    _ahrs->airspeed_estimate(airspeed_measured);
+    airspeed_error = _AIMED_AIRSPEED - airspeed_measured;
+
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
-    float alt_error, ahrs_negative_alt;
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
         _altFilter.apply(_last_good_rangefinder_reading, -ahrs_negative_alt, time);
         alt_error = _ALT_REF - _altFilter.get() + alt_adjust;
     } else {
         alt_error = _ALT_REF - _last_good_rangefinder_reading + alt_adjust;
-
     }
 
+    // Control pitch using altitude
     _pitch = _pitch_pid.get_pid(alt_error);
-    _throttle = _throttle_pid.get_pid(alt_error) + _THR_REF;
+
+    // Control throttle using airspeed
+    _throttle = _throttle_pid.get_pid(airspeed_error) + _THR_REF;
+
+    // Constrain throttle to min and max
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
 
     return;
