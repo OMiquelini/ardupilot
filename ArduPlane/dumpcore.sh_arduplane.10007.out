@@ -1,0 +1,8 @@
+[New Thread 70188.0x10ef4]
+[New Thread 70188.0x10e94]
+[New Thread 70188.0x10e30]
+[New Thread 70188.0x10de8]
+warning: cannot close "ap-10015.core": invalid operation
+/tmp/gdb.10015:2: Error in sourced command file:
+Can't create a corefile
+[Inferior 1 (process 70188) detached]

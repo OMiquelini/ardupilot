@@ -252,3 +252,25 @@
 #ifndef THR_CTRL_LAND_THRESH
  #define THR_CTRL_LAND_THRESH 0.7
 #endif
+
+//////////////////////////////////////////////////////////////////////////////
+//  new fbwb airspeed controll
+#ifndef FBWB_TAS_DEFAULT
+ # define FBWB_TAS_DEFAULT 7
+#endif
+
+#ifndef FBWB_AS_P_DEFAULT
+ # define FBWB_AS_P_DEFAULT 50
+#endif
+
+#ifndef FBWB_AS_I_DEFAULT
+ # define FBWB_AS_I_DEFAULT 0
+#endif
+
+#ifndef FBWB_AS_D_DEFAULT
+ # define FBWB_AS_D_DEFAULT 0
+#endif
+
+#ifndef FBWB_AS_IMAX_DEFAULT
+ # define FBWB_AS_IMAX_DEFAULT 500
+#endif

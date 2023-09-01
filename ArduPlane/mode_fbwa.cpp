@@ -28,7 +28,6 @@ void ModeFBWA::update()
         RC_Channel *chan_pot = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
         float pot_input = chan_pot->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.altitude_adjustment(pot_input);
-        GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"Altitude correction %f",pot_input*0.5);
 
         plane.g2.ground_effect_controller.update();
 
@@ -45,6 +44,7 @@ void ModeFBWA::update()
         } else {
             float gnd_throttle=plane.g2.ground_effect_controller.get_throttle();
             SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, gnd_throttle);
+            //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"throttle: %f",gnd_throttle);
         }
 
         plane.nav_pitch_cd += plane.g2.ground_effect_controller.get_pitch(); // Note that this stacks

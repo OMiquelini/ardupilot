@@ -996,6 +996,13 @@ const AP_Param::Info Plane::var_info[] = {
     // @Group:
     // @Path: ../libraries/AP_Vehicle/AP_Vehicle.cpp
     PARAM_VEHICLE_INFO,
+    
+    //NEW FBWB AS CONTROLL
+    GSCALAR(FBWB_TAS, "FBWB_TAS", FBWB_TAS_DEFAULT),
+    GSCALAR(FBWB_AS_P, "FBWB_AS_P", FBWB_AS_P_DEFAULT),
+    GSCALAR(FBWB_AS_I, "FBWB_AS_I", FBWB_AS_I_DEFAULT),
+    GSCALAR(FBWB_AS_D, "FBWB_AS_D", FBWB_AS_D_DEFAULT),
+    GSCALAR(FBWB_AS_IMAX, "FBWB_AS_IMAX", FBWB_AS_IMAX_DEFAULT),
 
     AP_VAREND
 };
