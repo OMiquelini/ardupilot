@@ -792,14 +792,14 @@ bool AP_AHRS::airspeed_estimate(float &airspeed_ret) const
         uint8_t idx = get_active_airspeed_index();
         airspeed_ret = AP::airspeed()->get_airspeed(idx);
 
-        /*if (_wind_max > 0 && AP::gps().status() >= AP_GPS::GPS_OK_FIX_2D) {
+        if (_wind_max > 0 && AP::gps().status() >= AP_GPS::GPS_OK_FIX_2D) {
             // constrain the airspeed by the ground speed
             // and AHRS_WIND_MAX
             const float gnd_speed = AP::gps().ground_speed();
             float true_airspeed = airspeed_ret * get_EAS2TAS();
             true_airspeed = constrain_float(true_airspeed, gnd_speed - _wind_max, gnd_speed + _wind_max);
             airspeed_ret = true_airspeed / get_EAS2TAS();
-        }*/
+        }
 
         return true;
     }
