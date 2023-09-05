@@ -74,6 +74,7 @@ private:
     bool _enabled;
     int32_t _pitch;
     int16_t _throttle;
+    int16_t _throttle_ant;
 
 };
 

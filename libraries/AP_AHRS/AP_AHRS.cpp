@@ -797,7 +797,9 @@ bool AP_AHRS::airspeed_estimate(float &airspeed_ret) const
             // and AHRS_WIND_MAX
             const float gnd_speed = AP::gps().ground_speed();
             float true_airspeed = airspeed_ret * get_EAS2TAS();
-            true_airspeed = constrain_float(true_airspeed, gnd_speed - _wind_max, gnd_speed + _wind_max);
+            true_airspeed = constrain_float(true_airspeed,
+                                            gnd_speed - _wind_max,
+                                            gnd_speed + _wind_max);
             airspeed_ret = true_airspeed / get_EAS2TAS();
         }
 

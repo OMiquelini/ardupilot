@@ -3,7 +3,7 @@
 #include <GCS_MAVLink/GCS.h>
 bool message_sent = false;
 void ModeFBWA::update()
-{
+{    
     // set nav_roll and nav_pitch using sticks
     plane.nav_roll_cd  = plane.channel_roll->norm_input() * plane.roll_limit_cd;
     plane.update_load_factor();
@@ -14,13 +14,11 @@ void ModeFBWA::update()
         plane.nav_pitch_cd = -(pitch_input * plane.pitch_limit_min_cd);
     }
     
-    #if HAL_GROUND_EFFECT_ENABLED
+#if HAL_GROUND_EFFECT_ENABLED 
     //leitura do canal do rádio configurado para aux_func efeito solo (175)
     RC_Channel *chan_gndef = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GROUND_EFFECT);
-
     //verifica se o canal está configurado para efeito solo
-    bool gndef_mode = chan_gndef->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH; 
-
+    bool gndef_mode = chan_gndef->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
     //se a chave estiver para baixo, realiza o voo em efeito solo, do contrario, voa com fbwa normalmente
     if(gndef_mode){
         
@@ -28,6 +26,7 @@ void ModeFBWA::update()
         RC_Channel *chan_pot = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
         float pot_input = chan_pot->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.altitude_adjustment(pot_input);
+        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"Altitude correction %f",pot_input*0.5);
 
         plane.g2.ground_effect_controller.update();
 
@@ -44,17 +43,16 @@ void ModeFBWA::update()
         } else {
             float gnd_throttle=plane.g2.ground_effect_controller.get_throttle();
             SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, gnd_throttle);
-            //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"throttle: %f",gnd_throttle);
         }
 
         plane.nav_pitch_cd += plane.g2.ground_effect_controller.get_pitch(); // Note that this stacks
     } else {
-    #endif
+#endif
         plane.adjust_nav_pitch_throttle();
         message_sent=false;
-    #if HAL_GROUND_EFFECT_ENABLED 
+#if HAL_GROUND_EFFECT_ENABLED 
     }
-    #endif
+#endif
     plane.nav_pitch_cd = constrain_int32(plane.nav_pitch_cd, plane.pitch_limit_min_cd, plane.aparm.pitch_limit_max_cd.get());
     if (plane.fly_inverted()) {
         plane.nav_pitch_cd = -plane.nav_pitch_cd;

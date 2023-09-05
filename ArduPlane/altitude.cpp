@@ -653,7 +653,6 @@ void Plane::rangefinder_height_update(void)
         }
         //add body rotation and rangefinder position offset correction
         rangefinder_state.height_estimate = (distance* ahrs.get_rotation_body_to_ned().c.z)-pos_offset.y*ahrs.sin_roll()-pos_offset.x*ahrs.sin_pitch();
-        printf("estimate = %f\n",rangefinder_state.height_estimate);
 
         rangefinder_terrain_correction(rangefinder_state.height_estimate);
 
