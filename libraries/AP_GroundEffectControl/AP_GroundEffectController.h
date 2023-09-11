@@ -48,6 +48,8 @@ public:
 
     int16_t get_throttle() { return _throttle; }
 
+    float turn_correction();
+
 private:
     PID _pitch_pid{120.0, 0.0, 0.0, 1000};
     PID _throttle_pid{64, 0.0, 0.0, 1000};
