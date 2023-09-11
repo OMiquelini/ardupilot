@@ -60,6 +60,7 @@ private:
     AP_Float _CUTOFF_FREQ;
     AP_Float _LIM_ROLL;
     AP_Float _AIMED_AIRSPEED;
+    AP_Int8 _TURN_CORRECTION;
 
     AP_PIDInfo _pid_info;
 
