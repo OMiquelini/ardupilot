@@ -639,6 +639,10 @@ void Plane::update_load_factor(void)
     }
 #endif
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8ee51a84d8 (Fixed | Add roll limit to GNDEF | Rangefinder pos_offset correction)
 #if HAL_GROUND_EFFECT_ENABLED
         // limit roll when in ground effect
         nav_roll_cd = constrain_int32(nav_roll_cd, -g2.ground_effect_controller.get_auto_lim_roll_cd(), g2.ground_effect_controller.get_auto_lim_roll_cd());
