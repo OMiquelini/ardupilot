@@ -356,6 +356,13 @@ public:
         k_param_fence,         // vehicle fence - unused
         k_param_acro_yaw_rate,
         k_param_takeoff_throttle_max_t,
+
+        //264 to 267
+        k_param_FBWB_TAS,
+        k_param_FBWB_AS_P,
+        k_param_FBWB_AS_I,
+        k_param_FBWB_AS_D,
+        k_param_FBWB_AS_IMAX,
     };
 
     AP_Int16 format_version;
@@ -467,6 +474,13 @@ public:
     AP_Int8 override_channel;
 #endif
     AP_Int16 gcs_pid_mask;
+
+    //new fbwb airspeed controll
+    AP_Float FBWB_TAS;
+    AP_Int16 FBWB_AS_P;
+    AP_Int16 FBWB_AS_I;
+    AP_Int16 FBWB_AS_D;
+    AP_Int16 FBWB_AS_IMAX;
 };
 
 /*

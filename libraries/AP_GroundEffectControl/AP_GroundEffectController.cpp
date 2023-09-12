@@ -167,7 +167,7 @@ void GroundEffectController::update()
 
     // Control throttle using airspeed
     _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error) + _THR_REF;
+    _throttle = _throttle_pid.get_pid(airspeed_error) + _throttle_ant;//_THR_REF;
 
     // Constrain throttle to min and max
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
