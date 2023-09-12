@@ -50,6 +50,8 @@ public:
 
     float turn_correction();
 
+    float get_max_roll();
+
 private:
     PID _pitch_pid{120.0, 0.0, 0.0, 1000};
     PID _throttle_pid{64, 0.0, 0.0, 1000};
@@ -63,6 +65,7 @@ private:
     AP_Float _LIM_ROLL;
     AP_Float _AIMED_AIRSPEED;
     AP_Int8 _TURN_CORRECTION;
+    AP_Float _WING_SPAN;
 
     AP_PIDInfo _pid_info;
 

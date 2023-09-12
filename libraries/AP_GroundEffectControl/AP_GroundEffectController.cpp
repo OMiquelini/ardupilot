@@ -106,6 +106,8 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     // @Description: Enables turn correction using LIDAR poss_offset 
     // @Range: 0 1
     AP_GROUPINFO("_TURN_CORRECTION", 11, GroundEffectController, _TURN_CORRECTION, 0),
+
+    AP_GROUPINFO("WING_SPAN", 12, GroundEffectController, _WING_SPAN, 1),
     
     AP_GROUPEND
 };
@@ -140,7 +142,26 @@ int32_t GroundEffectController::get_auto_lim_roll_cd()
     if(_LIM_ROLL <= 0.0001f){
         return INT32_MAX;
     }
-    return int32_t(_LIM_ROLL*100.0);
+    return int32_t(MIN(_LIM_ROLL*100.0, get_max_roll()));
+}
+
+void GroundEffectController::altitude_adjustment(float ref)
+{
+    alt_adjust = (ref+(1-_ahrs->cos_roll()))*0.5;
+    return;
+}
+
+float GroundEffectController::turn_correction()
+{
+    float correction=0;
+    Vector3f pos_offset=_rangefinder->get_pos_offset_orient(ROTATION_PITCH_270);
+    correction=(_rangefinder->distance_orient(ROTATION_PITCH_270)*_ahrs->get_rotation_body_to_ned().c.z)-pos_offset.y*_ahrs->sin_roll()-pos_offset.x*_ahrs->sin_pitch();
+    return correction;
+}
+
+float GroundEffectController::get_max_roll()
+{
+    return safe_asin(turn_correction()/_WING_SPAN)*100;
 }
 
 void GroundEffectController::update()
@@ -186,20 +207,6 @@ void GroundEffectController::update()
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
 
     return;
-}
-
-void GroundEffectController::altitude_adjustment(float ref)
-{
-    alt_adjust = ref*0.5;
-    return;
-}
-
-float GroundEffectController::turn_correction()
-{
-    float correction=0;
-    Vector3f pos_offset=_rangefinder->get_pos_offset_orient(ROTATION_PITCH_270);
-    correction=(_rangefinder->distance_orient(ROTATION_PITCH_270)*_ahrs->get_rotation_body_to_ned().c.z)-pos_offset.y*_ahrs->sin_roll()-pos_offset.x*_ahrs->sin_pitch();
-    return correction;
 }
 
 #endif // HAL_GROUND_EFFECT_ENABLED
