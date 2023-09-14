@@ -36,6 +36,10 @@ public:
 
 	void reset();
 
+    float turn_correction();
+
+    float get_max_roll();
+
     float alt_adjust=0;
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
@@ -60,6 +64,8 @@ private:
     AP_Float _CUTOFF_FREQ;
     AP_Float _LIM_ROLL;
     AP_Float _AIMED_AIRSPEED;
+    AP_Int8 _ENABLE_TURN;
+    AP_Float _WING_SPAN;
 
     AP_PIDInfo _pid_info;
 
