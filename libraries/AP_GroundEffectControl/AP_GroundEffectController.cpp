@@ -97,12 +97,17 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
 
     // @Param: _AIRSPEED
     // @DisplayName: Airspeed Aimed
-    // @Description:
-    // @Range: 1.0  15.0
+    // @Description: Desired airspeed during ground effect flight
     AP_GROUPINFO("_AIRSPEED", 10, GroundEffectController, _AIMED_AIRSPEED, 7.0),
 
+    // @Param: _TURN
+    // @DisplayName: Enable turn controll
+    // @Description: Enable roll limits to controll turns in ground effect flight
     AP_GROUPINFO("_TURN", 11, GroundEffectController, _ENABLE_TURN, 0),
 
+    // @Param: _WING_SPAN
+    // @DisplayName: Wing span
+    // @Description: Aircraft wing span to calculate max roll within ground effect flight to avoid touching the water
     AP_GROUPINFO("_WING_SPAN", 12, GroundEffectController, _WING_SPAN, 1),
 
     AP_GROUPEND
@@ -135,7 +140,7 @@ int32_t GroundEffectController::get_auto_lim_roll_cd()
     if(_LIM_ROLL <= 0.0001f){
         return INT32_MAX;
     }
-    return MIN(_LIM_ROLL, get_max_roll());
+    return MIN(_LIM_ROLL, get_max_roll())*100;
 }
 
 float GroundEffectController::turn_correction()
@@ -154,7 +159,7 @@ void GroundEffectController::altitude_adjustment(float ref)
 
 float GroundEffectController::get_max_roll()
 {
-    return safe_asin(turn_correction()/_WING_SPAN)*100;
+    return safe_asin(turn_correction()/_WING_SPAN);
 }
 
 int GroundEffectController::turn_limit_on()
