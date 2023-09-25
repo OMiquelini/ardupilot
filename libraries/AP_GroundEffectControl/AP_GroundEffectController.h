@@ -56,7 +56,7 @@ public:
 
 private:
     PID _pitch_pid{120.0, 0.0, 0.0, 1000};
-    PID _throttle_pid{64, 0.0, 0.0, 1000};
+    PID _throttle_pid{14.78, 4.9, 6.38, 1000};
 
     AP_Int8 _ACTIVE;
 	AP_Float _THR_REF;
