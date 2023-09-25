@@ -40,6 +40,8 @@ public:
 
     float get_max_roll();
 
+    int turn_limit_on();
+
     float alt_adjust=0;
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }

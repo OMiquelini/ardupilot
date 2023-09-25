@@ -103,7 +103,7 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
 
     AP_GROUPINFO("_TURN", 11, GroundEffectController, _ENABLE_TURN, 0),
 
-    AP_GROUPINFO("WING_SPAN", 12, GroundEffectController, _WING_SPAN, 1),
+    AP_GROUPINFO("_WING_SPAN", 12, GroundEffectController, _WING_SPAN, 1),
 
     AP_GROUPEND
 };
@@ -135,7 +135,7 @@ int32_t GroundEffectController::get_auto_lim_roll_cd()
     if(_LIM_ROLL <= 0.0001f){
         return INT32_MAX;
     }
-    return int32_t(_LIM_ROLL*100.0);
+    return MIN(_LIM_ROLL, get_max_roll());
 }
 
 float GroundEffectController::turn_correction()
@@ -155,6 +155,18 @@ void GroundEffectController::altitude_adjustment(float ref)
 float GroundEffectController::get_max_roll()
 {
     return safe_asin(turn_correction()/_WING_SPAN)*100;
+}
+
+int GroundEffectController::turn_limit_on()
+{
+    if(_ENABLE_TURN)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 void GroundEffectController::update()
@@ -179,7 +191,7 @@ void GroundEffectController::update()
     float alt_error, ahrs_negative_alt, airspeed_measured = 0.1, airspeed_error = 0;
 
     _ahrs->airspeed_estimate(airspeed_measured);
-    airspeed_error = _AIMED_AIRSPEED - airspeed_measured;
+    airspeed_error = _AIMED_AIRSPEED - airspeed_measured;//TODO: ajuste de velocidade alvo
 
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
@@ -194,7 +206,7 @@ void GroundEffectController::update()
 
     // Control throttle using airspeed
     _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error) + _throttle_ant;//_THR_REF;
+    _throttle = _throttle_pid.get_pid(airspeed_error) + _THR_REF;
 
     // Constrain throttle to min and max
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);

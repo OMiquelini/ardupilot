@@ -640,18 +640,15 @@ void Plane::update_load_factor(void)
 #endif
 
 #if HAL_GROUND_EFFECT_ENABLED
-        // limit roll when in ground effect
-        nav_roll_cd = constrain_int32(nav_roll_cd, -g2.ground_effect_controller.get_auto_lim_roll_cd(), g2.ground_effect_controller.get_auto_lim_roll_cd());
-        roll_limit_cd = MIN(roll_limit_cd, g2.ground_effect_controller.get_auto_lim_roll_cd());
-        return;
+        // limit roll when in ground effec
+        if(g2.ground_effect_controller.turn_limit_on())
+        {
+            nav_roll_cd = constrain_int32(nav_roll_cd, -g2.ground_effect_controller.get_auto_lim_roll_cd(), g2.ground_effect_controller.get_auto_lim_roll_cd());
+            roll_limit_cd = MIN(roll_limit_cd, g2.ground_effect_controller.get_auto_lim_roll_cd());
+            return;
+        }
+        
 #endif
-
-#if HAL_GROUND_EFFECT_ENABLED
-        // limit roll when in ground effect
-        nav_roll_cd = constrain_int32(nav_roll_cd, -g2.ground_effect_controller.get_auto_lim_roll_cd(), g2.ground_effect_controller.get_auto_lim_roll_cd());
-        roll_limit_cd = MIN(roll_limit_cd, g2.ground_effect_controller.get_auto_lim_roll_cd());
-        return;
-#endif 
 
     float max_load_factor = smoothed_airspeed / MAX(aparm.airspeed_min, 1);
     if (max_load_factor <= 1) {

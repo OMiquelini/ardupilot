@@ -1736,7 +1736,7 @@ void AP_OSD_Screen::draw_sidebars(uint8_t x, uint8_t y)
     for (int i = 0; i < 7; i++){
         if (i == 3) {
             // the middle section of the ladder with the currrent airspeed
-            backend->write(x, y+i, false, "%3d%c%c", (int) scaled_aspd, u_icon(SPEED), SYMBOL(SYM_SIDEBAR_R_ARROW));
+            backend->write(x, y+i, false, "%3.1f%c%c", scaled_aspd, u_icon(SPEED), SYMBOL(SYM_SIDEBAR_R_ARROW));
         } else {
             backend->write(x+4, y+i, false,  "%c", SYMBOL(sidebar_sectors[aspd_symbol_index]));
         }
@@ -2246,7 +2246,7 @@ void AP_OSD_Screen::draw_rngf(uint8_t x, uint8_t y)
         backend->write(x, y, false, "%c---%c", SYMBOL(SYM_RNGFD), u_icon(DISTANCE));
     } else {
         const float distance = rangefinder->distance_orient(ROTATION_PITCH_270);
-        backend->write(x, y, false, "%c%4.1f%c", SYMBOL(SYM_RNGFD), u_scale(DISTANCE, distance), u_icon(DISTANCE));
+        backend->write(x, y, false, "%c%4.2f%c", SYMBOL(SYM_RNGFD), u_scale(DISTANCE, distance), u_icon(DISTANCE));
     }
 }
 
