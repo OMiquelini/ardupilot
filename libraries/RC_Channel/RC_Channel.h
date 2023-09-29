@@ -248,7 +248,8 @@ public:
         PLANE_AUTO_LANDING_ABORT = 173, // Abort Glide-slope or VTOL landing during payload place or do_land type mission items
         CAMERA_IMAGE_TRACKING   = 174, // camera image tracking
         GROUND_EFFECT           = 175, // Use ground effect controller in FBWA
-        GNDEF_POT_ALT           = 176, // Use radio signal to 
+        GNDEF_POT_ALT           = 176, // Potenciometro para ajustar altura de referencia
+        GNDEF_POT_SPD           = 177, // Potenciometro para ajustar velocidade de referencia
 
 
         // inputs from 200 will eventually used to replace RCMAP

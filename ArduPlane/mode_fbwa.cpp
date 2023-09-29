@@ -17,16 +17,23 @@ void ModeFBWA::update()
 #if HAL_GROUND_EFFECT_ENABLED 
     //leitura do canal do rádio configurado para aux_func efeito solo (175)
     RC_Channel *chan_gndef = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GROUND_EFFECT);
+
     //verifica se o canal está configurado para efeito solo
     bool gndef_mode = chan_gndef->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+    
     //se a chave estiver para baixo, realiza o voo em efeito solo, do contrario, voa com fbwa normalmente
     if(gndef_mode){
         
         //ajuste de altura de referencia com input do piloto (176)
-        RC_Channel *chan_pot = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
-        float pot_input = chan_pot->norm_input_ignore_trim();
-        plane.g2.ground_effect_controller.altitude_adjustment(pot_input);
+        RC_Channel *chan_alt = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
+        float pot_alt = chan_alt->norm_input_ignore_trim();
+        plane.g2.ground_effect_controller.altitude_adjustment(pot_alt);
         //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"Altitude correction %f",pot_input*0.5);
+
+        //ajuste de velocidade de referência com input do piloto (177)
+        RC_Channel *chan_spd = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_SPD);
+        float pot_spd = chan_spd->norm_input_ignore_trim();
+        plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
 
         plane.g2.ground_effect_controller.update();
 

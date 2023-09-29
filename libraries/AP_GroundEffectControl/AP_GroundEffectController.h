@@ -42,7 +42,11 @@ public:
 
     int turn_limit_on();
 
+    void speed_adjustment(float ref);
+
     float alt_adjust=0;
+
+    float spd_adjust=0;
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
 
@@ -56,7 +60,7 @@ public:
 
 private:
     PID _pitch_pid{120.0, 0.0, 0.0, 1000};
-    PID _throttle_pid{14.78, 4.9, 6.38, 1000};
+    PID _throttle_pid{14.78, 4.9, 6.38, 300};
 
     AP_Int8 _ACTIVE;
 	AP_Float _THR_REF;

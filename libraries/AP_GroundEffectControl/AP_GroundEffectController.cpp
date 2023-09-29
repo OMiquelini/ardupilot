@@ -36,7 +36,7 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
 
     // @Param: _throttle_pid_P
     // @DisplayName: P gain
-    // @Description: P gain. A 1 meter error from desired alt changes throttle by this many percent.
+    // @Description: P gain. A 1 m/s error from desired airspeed changes throttle by this many percent.
     // @Range: 0.0 200.0
     // @User: Standard
     AP_SUBGROUPINFO(_throttle_pid, "_THR_", 2, GroundEffectController, PID),
@@ -174,6 +174,12 @@ int GroundEffectController::turn_limit_on()
     }
 }
 
+void GroundEffectController::speed_adjustment(float ref)
+{
+    spd_adjust = ref;
+    return;
+}
+
 void GroundEffectController::update()
 {
     uint32_t time = AP_HAL::micros();
@@ -193,10 +199,10 @@ void GroundEffectController::update()
         }
     }
 
-    float alt_error, ahrs_negative_alt, airspeed_measured = 0.1, airspeed_error = 0;
+    float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
 
     _ahrs->airspeed_estimate(airspeed_measured);
-    airspeed_error = _AIMED_AIRSPEED - airspeed_measured;//TODO: ajuste de velocidade alvo
+    airspeed_error = _AIMED_AIRSPEED - airspeed_measured + spd_adjust;//TODO: ajuste de velocidade alvo
 
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
