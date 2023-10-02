@@ -202,14 +202,14 @@ void GroundEffectController::update()
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
 
     _ahrs->airspeed_estimate(airspeed_measured);
-    airspeed_error = _AIMED_AIRSPEED - airspeed_measured + spd_adjust;//TODO: ajuste de velocidade alvo
+    airspeed_error = (_AIMED_AIRSPEED + spd_adjust) - airspeed_measured;
 
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
         _altFilter.apply(_last_good_rangefinder_reading, -ahrs_negative_alt, time);
-        alt_error = _ALT_REF - _altFilter.get() + alt_adjust;
+        alt_error = _ALT_REF + alt_adjust - _altFilter.get();
     } else {
-        alt_error = _ALT_REF - _last_good_rangefinder_reading + alt_adjust;
+        alt_error = _ALT_REF + alt_adjust - _last_good_rangefinder_reading;
     }
 
     // Control pitch using altitude
@@ -217,7 +217,7 @@ void GroundEffectController::update()
 
     // Control throttle using airspeed
     _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error) + _THR_REF;
+    _throttle = _throttle_pid.get_pid(airspeed_error);// + _THR_REF;
 
     // Constrain throttle to min and max
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);

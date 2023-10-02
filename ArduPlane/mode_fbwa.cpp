@@ -28,7 +28,6 @@ void ModeFBWA::update()
         RC_Channel *chan_alt = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
         float pot_alt = chan_alt->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.altitude_adjustment(pot_alt);
-        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"Altitude correction %f",pot_input*0.5);
 
         //ajuste de velocidade de referência com input do piloto (177)
         RC_Channel *chan_spd = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_SPD);
