@@ -140,6 +140,7 @@ public:
     friend class ModeTraining;
     friend class ModeAcro;
     friend class ModeFBWA;
+    friend class ModeGNDEF;
     friend class ModeFBWB;
     friend class ModeCruise;
     friend class ModeAutoTune;
