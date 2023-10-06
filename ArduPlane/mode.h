@@ -799,7 +799,7 @@ public:
 
     Number mode_number() const override { return Number::GROUND_EFFECT; }
     const char *name() const override { return "GROUND_EFFECT"; }
-    const char *name4() const override { return "GNDEF"; }
+    const char *name4() const override { return "GNDE"; }
 
     // methods that affect movement of the vehicle in this mode
     void update() override;

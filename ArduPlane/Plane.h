@@ -265,6 +265,7 @@ private:
     ModeTraining mode_training;
     ModeAcro mode_acro;
     ModeFBWA mode_fbwa;
+    ModeGNDEF mode_gndef;
     ModeFBWB mode_fbwb;
     ModeCruise mode_cruise;
     ModeAutoTune mode_autotune;
