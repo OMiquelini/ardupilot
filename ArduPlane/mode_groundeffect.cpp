@@ -1,7 +1,9 @@
 #include "mode.h"
 #include "Plane.h"
 #include <GCS_MAVLink/GCS.h>
+
 bool message_gndef = false;
+int cont=0;
 void ModeGNDEF::update()
 {    
     // set nav_roll and nav_pitch using sticks
@@ -33,6 +35,13 @@ void ModeGNDEF::update()
         GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Ground effect enabled");
         message_gndef=true;
     }
+    else if(cont==500)
+    {
+        message_gndef=false;
+        cont=0;
+    }
+    else
+        cont++;
 
     // Se o controle estiver com throttle em 0, ignora o valor do controlador pid e escreve throttle = 0
     if(plane.channel_throttle->in_trim_dz()){
