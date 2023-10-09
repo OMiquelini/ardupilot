@@ -44,6 +44,8 @@ public:
 
     void speed_adjustment(float ref);
 
+    void landing();
+
     float alt_adjust=0;
 
     float spd_adjust=0;

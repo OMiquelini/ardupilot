@@ -17,17 +17,28 @@ void ModeGNDEF::update()
     }
     
 #if HAL_GROUND_EFFECT_ENABLED         
-    //ajuste de altura de referencia com input do piloto (176)
+    //ajuste de altura de referencia com input do piloto (175)
     RC_Channel *chan_alt = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
     float pot_alt = chan_alt->norm_input_ignore_trim();
     plane.g2.ground_effect_controller.altitude_adjustment(pot_alt);
 
-    //ajuste de velocidade de referência com input do piloto (177)
+    //ajuste de velocidade de referência com input do piloto (176)
     RC_Channel *chan_spd = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_SPD);
     float pot_spd = chan_spd->norm_input_ignore_trim();
     plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
 
-    plane.g2.ground_effect_controller.update();
+    //ativar pouso em efeito solo (177)
+    RC_Channel *chan_lnd = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
+    bool gndef_land = chan_lnd->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+
+    if(gndef_land)//TODO: se stick de pitch for máximo, abortar pouso
+    {
+        plane.g2.ground_effect_controller.landing();
+    }
+    else
+    {
+        plane.g2.ground_effect_controller.update();
+    }
 
     //Mensagem ao entrar em modo de efeito solo
     if (message_gndef==false)

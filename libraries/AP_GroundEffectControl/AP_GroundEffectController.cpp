@@ -180,6 +180,13 @@ void GroundEffectController::speed_adjustment(float ref)
     return;
 }
 
+void GroundEffectController::landing()
+{
+
+}
+
+//novas funçoes aqui
+
 void GroundEffectController::update()
 {
     uint32_t time = AP_HAL::micros();
@@ -202,7 +209,7 @@ void GroundEffectController::update()
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
 
     _ahrs->airspeed_estimate(airspeed_measured);
-    airspeed_error = (_AIMED_AIRSPEED + spd_adjust) - airspeed_measured;
+    airspeed_error = (_AIMED_AIRSPEED + spd_adjust) - airspeed_measured; //TODO: chave de velocidade ser a mesma de throttle
 
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
@@ -217,7 +224,7 @@ void GroundEffectController::update()
 
     // Control throttle using airspeed
     _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error);// + _THR_REF;
+    _throttle = _throttle_pid.get_pid(airspeed_error);
 
     // Constrain throttle to min and max
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
