@@ -23,15 +23,16 @@ void ModeGNDEF::update()
     plane.g2.ground_effect_controller.altitude_adjustment(pot_alt);
 
     //ajuste de velocidade de referência com input do piloto (176)
-    RC_Channel *chan_spd = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_SPD);
-    float pot_spd = chan_spd->norm_input_ignore_trim();
+    //RC_Channel *chan_spd = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_SPD);
+    //TODO: chave de velocidade ser a mesma de throttle
+    float pot_spd = plane.channel_throttle->norm_input_ignore_trim();//chan_spd->norm_input_ignore_trim();
     plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
 
     //ativar pouso em efeito solo (177)
     RC_Channel *chan_lnd = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
     bool gndef_land = chan_lnd->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
 
-    if(gndef_land)//TODO: se stick de pitch for máximo, abortar pouso
+    if(gndef_land && !(plane.channel_pitch->in_trim_dz()))//TODO: se stick de pitch não estiver trimado, abortar pouso
     {
         plane.g2.ground_effect_controller.landing();
     }

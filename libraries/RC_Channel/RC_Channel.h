@@ -247,8 +247,9 @@ public:
         BATTERY_MPPT_ENABLE     = 172,// Battery MPPT Power enable. high = ON, mid = auto (controlled by mppt/batt driver), low = OFF. This effects all MPPTs.
         PLANE_AUTO_LANDING_ABORT = 173, // Abort Glide-slope or VTOL landing during payload place or do_land type mission items
         CAMERA_IMAGE_TRACKING   = 174, // camera image tracking
-        GNDEF_POT_ALT           = 175, // Potenciometro para ajustar altura de referencia
-        GNDEF_POT_SPD           = 176, // Potenciometro para ajustar velocidade de referencia
+        GROUND_EFFECT           =175,
+        GNDEF_POT_ALT           = 176, // Potenciometro para ajustar altura de referencia
+        //GNDEF_POT_SPD           = 177, // Potenciometro para ajustar velocidade de referencia
         GNDEF_LAND              =177, // Chave para ativar pouso em efeito solo
 
 

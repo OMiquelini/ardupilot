@@ -176,7 +176,7 @@ int GroundEffectController::turn_limit_on()
 
 void GroundEffectController::speed_adjustment(float ref)
 {
-    spd_adjust = ref;
+    spd_adjust = ref*3;
     return;
 }
 
