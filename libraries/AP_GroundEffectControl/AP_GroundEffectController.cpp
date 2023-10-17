@@ -176,7 +176,7 @@ int GroundEffectController::turn_limit_on()
 
 void GroundEffectController::speed_adjustment(float ref)
 {
-    spd_adjust = ref;
+    spd_aimed = _AIMED_AIRSPEED+ref*3;
     return;
 }
 
@@ -202,7 +202,8 @@ void GroundEffectController::update()
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
 
     _ahrs->airspeed_estimate(airspeed_measured);
-    airspeed_error = (_AIMED_AIRSPEED + spd_adjust) - airspeed_measured;
+    airspeed_error = spd_aimed - airspeed_measured;
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Aimed speed: %f",spd_aimed);
 
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){

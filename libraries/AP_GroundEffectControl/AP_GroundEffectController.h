@@ -48,6 +48,8 @@ public:
 
     float spd_adjust=0;
 
+    float spd_aimed=0;
+
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
 
 	static const struct AP_Param::GroupInfo var_info[];
