@@ -22,10 +22,8 @@ void ModeGNDEF::update()
     float pot_alt = chan_alt->norm_input_ignore_trim();
     plane.g2.ground_effect_controller.altitude_adjustment(pot_alt);
 
-    //ajuste de velocidade de referência com input do piloto (176)
-    //RC_Channel *chan_spd = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_SPD);
     //TODO: chave de velocidade ser a mesma de throttle
-    float pot_spd = plane.channel_throttle->norm_input_ignore_trim();//chan_spd->norm_input_ignore_trim();
+    float pot_spd = plane.channel_throttle->norm_input_ignore_trim();
     plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
 
     //ativar pouso em efeito solo (177)

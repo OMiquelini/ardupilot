@@ -249,7 +249,6 @@ public:
         CAMERA_IMAGE_TRACKING   = 174, // camera image tracking
         GROUND_EFFECT           =175,
         GNDEF_POT_ALT           = 176, // Potenciometro para ajustar altura de referencia
-        //GNDEF_POT_SPD           = 177, // Potenciometro para ajustar velocidade de referencia
         GNDEF_LAND              =177, // Chave para ativar pouso em efeito solo
 
 

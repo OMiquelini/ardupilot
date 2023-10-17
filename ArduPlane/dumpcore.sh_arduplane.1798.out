@@ -1,0 +1,14 @@
+[New Thread 15272.0x232c]
+[New Thread 15272.0x6218]
+[New Thread 15272.0x1c6c]
+[New Thread 15272.0x634c]
+[New Thread 15272.0x2cfc]
+[New Thread 15272.0x5ee8]
+[New Thread 15272.0x5868]
+[New Thread 15272.0x63ac]
+[New Thread 15272.0x6ae8]
+[New Thread 15272.0x627c]
+warning: cannot close "ap-1806.core": invalid operation
+/tmp/gdb.1806:2: Error in sourced command file:
+Can't create a corefile
+[Inferior 1 (process 15272) detached]
