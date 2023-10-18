@@ -20,6 +20,7 @@ public:
             AP_Param::setup_object_defaults(this, var_info);
             _rangefinder = RangeFinder::get_singleton();
             _ahrs = AP_AHRS::get_singleton();
+            _singleton = this;
         };
 
     /* Do not allow copies */
@@ -46,8 +47,6 @@ public:
 
     float alt_adjust=0;
 
-    float spd_adjust=0;
-
     float spd_aimed=0;
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
@@ -59,6 +58,8 @@ public:
     int32_t get_pitch() { return _pitch; }
 
     int16_t get_throttle() { return _throttle; }
+
+    static GroundEffectController *get_singleton(void) { return _singleton; }
 
 private:
     PID _pitch_pid{120.0, 0.0, 0.0, 1000};
@@ -76,6 +77,8 @@ private:
     AP_Float _WING_SPAN;
 
     AP_PIDInfo _pid_info;
+
+    static GroundEffectController *_singleton;
 
     uint32_t _last_time_called;
 

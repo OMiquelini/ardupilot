@@ -53,6 +53,8 @@
 #include <GCS_MAVLink/GCS.h>
 #include <AC_Fence/AC_Fence.h>
 
+#include <AP_GroundEffectControl/AP_GroundEffectController.h>
+
 const AP_Param::GroupInfo AP_OSD_Screen::var_info[] = {
 
     // @Param: ENABLE
@@ -1186,6 +1188,8 @@ uint8_t AP_OSD_AbstractScreen::symbols_lookup_table[AP_OSD_NUM_SYMBOLS];
 #define SYM_SIDEBAR_I 89
 #define SYM_SIDEBAR_J 90
 
+#define SYM_GNDEF_SPEED 91
+
 #define SYMBOL(n) AP_OSD_AbstractScreen::symbols_lookup_table[n]
 
 // constructor
@@ -1671,7 +1675,7 @@ void AP_OSD_Screen::draw_heading(uint8_t x, uint8_t y)
 #if AP_RPM_ENABLED
 void AP_OSD_Screen::draw_rrpm(uint8_t x, uint8_t y)
 {
-    float _rrpm;
+    /*float _rrpm;
     const AP_RPM *rpm = AP_RPM::get_singleton();
     if (rpm != nullptr) {
             if (!rpm->get_rpm(0, _rrpm)) {
@@ -1683,7 +1687,15 @@ void AP_OSD_Screen::draw_rrpm(uint8_t x, uint8_t y)
             _rrpm = -1;
         }
     int r_rpm = static_cast<int>(_rrpm);
-    backend->write(x, y, false, "%4d%c", (int)r_rpm, SYMBOL(SYM_RPM));
+    backend->write(x, y, false, "%4d%c", (int)r_rpm, SYMBOL(SYM_RPM));*/
+    GroundEffectController *controller=GroundEffectController::get_singleton();
+
+    if (controller == nullptr) {
+       backend->write(x,y,false,"%c---%c",SYMBOL(SYM_ASPD), u_icon(SPEED));;
+    }else{
+       backend->write(x,y,false,"%c%3.3f%c",SYMBOL(SYM_ASPD),u_scale(SPEED,controller->spd_aimed), u_icon(SPEED));
+    }
+    
 }
 #endif
 
@@ -2249,6 +2261,15 @@ void AP_OSD_Screen::draw_rngf(uint8_t x, uint8_t y)
         backend->write(x, y, false, "%c%4.2f%c", SYMBOL(SYM_RNGFD), u_scale(DISTANCE, distance), u_icon(DISTANCE));
     }
 }
+
+/*void AP_OSD_Screen::draw_speed_adjust(uint8_t x, uint8_t y)
+{
+    GroundEffectController *controller=GroundEffectController::get_singleton();
+    if (controller == nullptr) {
+       return;
+    }
+    backend->write(x,y,false,"%c%2.2f%c",SYMBOL(SYM_ASPD),u_scale(SPEED,controller->spd_adjust), u_icon(SPEED));
+}*/
 
 #define DRAW_SETTING(n) if (n.enabled) draw_ ## n(n.xpos, n.ypos)
 
