@@ -174,6 +174,9 @@ void RC_Channel_Plane::init_aux_function(const RC_Channel::aux_func_t ch_option,
         break;
 
     case AUX_FUNC::SOARING:
+    case AUX_FUNC::GROUND_EFFECT:
+    case AUX_FUNC::GNDEF_POT_ALT:
+    case AUX_FUNC::GNDEF_POT_SPD:
 #if HAL_QUADPLANE_ENABLED
     case AUX_FUNC::Q_ASSIST:
     case AUX_FUNC::AIRMODE:

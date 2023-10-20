@@ -1693,7 +1693,7 @@ void AP_OSD_Screen::draw_rrpm(uint8_t x, uint8_t y)
     if (controller == nullptr) {
        backend->write(x,y,false,"%c---%c",SYMBOL(SYM_ASPD), u_icon(SPEED));;
     }else{
-       backend->write(x,y,false,"%c%3.3f%c",SYMBOL(SYM_ASPD),u_scale(SPEED,controller->spd_aimed), u_icon(SPEED));
+       backend->write(x,y,false,"%c%4.2f%c",SYMBOL(SYM_ASPD),u_scale(SPEED,controller->spd_aimed), u_icon(SPEED));
     }
     
 }
@@ -1837,7 +1837,7 @@ void AP_OSD_Screen::draw_aspeed(uint8_t x, uint8_t y)
     WITH_SEMAPHORE(ahrs.get_semaphore());
     bool have_estimate = ahrs.airspeed_estimate(aspd);
     if (have_estimate) {
-        backend->write(x, y, false, "%c%4d%c", SYMBOL(SYM_ASPD), (int)u_scale(SPEED, aspd), u_icon(SPEED));
+        backend->write(x, y, false, "%c%4.1f%c", SYMBOL(SYM_ASPD), u_scale(SPEED, aspd), u_icon(SPEED));
     } else {
         backend->write(x, y, false, "%c ---%c", SYMBOL(SYM_ASPD), u_icon(SPEED));
     }

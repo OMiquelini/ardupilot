@@ -1,0 +1,11 @@
+[New Thread 19588.0x84c0]
+[New Thread 19588.0x7184]
+[New Thread 19588.0x1e9c]
+[New Thread 19588.0x689c]
+[New Thread 19588.0x84bc]
+[New Thread 19588.0x1024]
+[New Thread 19588.0x60c4]
+warning: cannot close "ap-10207.core": invalid operation
+/tmp/gdb.10207:2: Error in sourced command file:
+Can't create a corefile
+[Inferior 1 (process 19588) detached]
