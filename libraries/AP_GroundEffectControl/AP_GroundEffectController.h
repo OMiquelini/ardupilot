@@ -59,6 +59,14 @@ public:
 
     int16_t get_throttle() { return _throttle; }
 
+    void set_land_sequence_value(bool value) {
+        _land_sequence = value;
+    }
+
+    bool get_land_sequence_value() {
+        return _land_sequence;
+    }
+
     static GroundEffectController *get_singleton(void) { return _singleton; }
 
 private:
@@ -75,6 +83,7 @@ private:
     AP_Float _AIMED_AIRSPEED;
     AP_Int8 _ENABLE_TURN;
     AP_Float _WING_SPAN;
+    AP_Float _ARSPD_RATE;
 
     AP_PIDInfo _pid_info;
 
@@ -92,6 +101,7 @@ private:
     int32_t _pitch;
     int16_t _throttle;
     int16_t _throttle_ant;
+    bool _land_sequence = false;
 
 };
 

@@ -110,6 +110,12 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     // @Description: Aircraft wing span to calculate max roll within ground effect flight to avoid touching the water
     AP_GROUPINFO("_WING_SPAN", 12, GroundEffectController, _WING_SPAN, 1),
 
+    // @Param; _ARSPD_RATE
+    // @DisplayName: Glide Slope Airspeed Rate
+    // @Description: Target airspeed rate to be used when the aircraft is in glide slope
+    AP_GROUPINFO("_ARSPD_RATE", 13, GroundEffectController, _ARSPD_RATE, 0.5),
+
+
     AP_GROUPEND
 };
 
