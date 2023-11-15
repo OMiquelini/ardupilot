@@ -110,6 +110,12 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     // @Description: Aircraft wing span to calculate max roll within ground effect flight to avoid touching the water
     AP_GROUPINFO("_WING_SPAN", 12, GroundEffectController, _WING_SPAN, 1),
 
+    // @Param; _VERT_SPD
+    // @DisplayName: Vertical Speed (m/s)
+    // @Description: Aimed vertical speed on landing
+    AP_GROUPINFO("_VERT_SPD", 13, GroundEffectController, _VERT_SPD, 1.5),
+
+
     AP_GROUPEND
 };
 
@@ -162,54 +168,43 @@ float GroundEffectController::get_max_roll()
     return safe_asin(turn_correction()/_WING_SPAN);
 }
 
-int GroundEffectController::turn_limit_on()
-{
-    if(_ENABLE_TURN)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+int GroundEffectController::turn_limit_on() {
+    return _ENABLE_TURN ? 1 : 0;
 }
 
 void GroundEffectController::speed_adjustment(float ref)
 {
-    spd_adjust = ref*3;
+    if(ref<=-0.850)
+        spd_aimed = 0.0;
+    else
+        spd_aimed = _AIMED_AIRSPEED+ref*3;
     return;
 }
-
-void GroundEffectController::landing()
-{
-
-}
-
-//novas funçoes aqui
 
 void GroundEffectController::update()
 {
     uint32_t time = AP_HAL::micros();
-    if(time - _last_time_called > RESET_TIMEOUT_MICROS){
+    if(time - _last_time_called > RESET_TIMEOUT_MICROS)
         reset();
-    }
     _last_time_called = time;
 
     if(_rangefinder->status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good) {
         if(_ENABLE_TURN)
-        {
             _last_good_rangefinder_reading = turn_correction();
-        }
         else
-        {
             _last_good_rangefinder_reading = _rangefinder->distance_orient(ROTATION_PITCH_270);
-        }
     }
 
+    //Switch modes
+    if(_land_sequence) { land_seq(); }
+    else { cruise(time); }
+}
+
+void GroundEffectController::cruise(uint32_t time) {
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
 
     _ahrs->airspeed_estimate(airspeed_measured);
-    airspeed_error = (_AIMED_AIRSPEED + spd_adjust) - airspeed_measured; //TODO: chave de velocidade ser a mesma de throttle
+    airspeed_error = spd_aimed - airspeed_measured;
 
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
@@ -224,12 +219,42 @@ void GroundEffectController::update()
 
     // Control throttle using airspeed
     _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error);
+    _throttle = _throttle_pid.get_pid(airspeed_error);// + _THR_REF;
 
     // Constrain throttle to min and max
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
 
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Aimed speed: %.2f %d",spd_aimed, _throttle);
+
     return;
 }
+
+void GroundEffectController::land_seq() {
+    // float _vert_spd_aimed = (float(_VERT_SPD) / 50);
+    float _vert_spd_measured;
+    _ahrs->get_vert_pos_rate(_vert_spd_measured);
+
+    // if (_vert_spd_measured > 0)
+    //     spd_error = _VERT_SPD - _vert_spd_measured; 
+    // else
+    //     spd_error = 0;
+    
+    // _throttle_ant = _throttle;
+    // _throttle = _throttle_pid.get_pid(spd_error);
+
+    // // Constrain throttle to min and max
+    // _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
+
+
+    if(timer == 0 || timer == 250) {
+        GCS_SEND_TEXT(MAV_SEVERITY_INFO, "Vertical speed measured: %f", _vert_spd_measured);
+        timer = 0;
+    }
+    timer++;
+
+    return;
+}
+
+GroundEffectController *GroundEffectController::_singleton;
 
 #endif // HAL_GROUND_EFFECT_ENABLED

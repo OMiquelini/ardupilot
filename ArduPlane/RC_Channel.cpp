@@ -174,6 +174,9 @@ void RC_Channel_Plane::init_aux_function(const RC_Channel::aux_func_t ch_option,
         break;
 
     case AUX_FUNC::SOARING:
+    case AUX_FUNC::GROUND_EFFECT:
+    case AUX_FUNC::GNDEF_POT_ALT:
+    case AUX_FUNC::GNDEF_LAND:
 #if HAL_QUADPLANE_ENABLED
     case AUX_FUNC::Q_ASSIST:
     case AUX_FUNC::AIRMODE:
@@ -427,15 +430,6 @@ bool RC_Channel_Plane::do_aux_function(const aux_func_t ch_option, const AuxSwit
            plane.autotune_enable(false); 
         }
         break;
-
-    #if HAL_GROUND_EFFECT_ENABLED
-        case AUX_FUNC::GROUND_EFFECT:
-
-        if(!plane.g2.ground_effect_controller.user_request_enable(ch_flag == AuxSwitchPos::HIGH)){
-            gcs().send_text(MAV_SEVERITY_NOTICE, "GND EFFECT FAILED");
-        }
-            break;
-    #endif
 
     default:
         return RC_Channel::do_aux_function(ch_option, ch_flag);
