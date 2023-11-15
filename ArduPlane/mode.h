@@ -53,7 +53,6 @@ public:
 #if HAL_QUADPLANE_ENABLED
         LOITER_ALT_QLAND = 25,
 #endif
-        GROUND_EFFECT = 26,
     };
 
     // Constructor
@@ -792,20 +791,5 @@ protected:
     bool _enter() override;
 };
 
-//TODO: Implementar Modo efeito solo aqui em vez de FBWA
-class ModeGNDEF : public Mode
-{
-public:
-
-    Number mode_number() const override { return Number::GROUND_EFFECT; }
-    const char *name() const override { return "GROUND_EFFECT"; }
-    const char *name4() const override { return "GNDE"; }
-
-    // methods that affect movement of the vehicle in this mode
-    void update() override;
-    
-    bool mode_allows_autotuning() const override { return true; }
-
-};
 
 #endif

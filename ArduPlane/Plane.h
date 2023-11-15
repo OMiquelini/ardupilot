@@ -140,7 +140,6 @@ public:
     friend class ModeTraining;
     friend class ModeAcro;
     friend class ModeFBWA;
-    friend class ModeGNDEF;
     friend class ModeFBWB;
     friend class ModeCruise;
     friend class ModeAutoTune;
@@ -265,7 +264,6 @@ private:
     ModeTraining mode_training;
     ModeAcro mode_acro;
     ModeFBWA mode_fbwa;
-    ModeGNDEF mode_gndef;
     ModeFBWB mode_fbwb;
     ModeCruise mode_cruise;
     ModeAutoTune mode_autotune;
@@ -312,9 +310,6 @@ private:
 
     // last time we ran roll/pitch stabilization
     uint32_t last_stabilize_ms;
-
-    // This is used to enable the ground effect sub-mode of fbwa
-    bool ground_effect_submode;
 
     // Failsafe
     struct {
