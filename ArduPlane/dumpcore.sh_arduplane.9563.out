@@ -1,0 +1,11 @@
+[New Thread 31664.0x665c]
+[New Thread 31664.0x80ec]
+[New Thread 31664.0x7d64]
+[New Thread 31664.0x70e8]
+[New Thread 31664.0x7f98]
+[New Thread 31664.0x809c]
+[New Thread 31664.0x84c0]
+warning: cannot close "ap-9571.core": invalid operation
+/tmp/gdb.9571:2: Error in sourced command file:
+Can't create a corefile
+[Inferior 1 (process 31664) detached]

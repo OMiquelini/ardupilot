@@ -50,7 +50,7 @@ public:
     void speed_adjustment(float ref);
 
     float alt_adjust = 0;
-
+  
     float spd_aimed = 0;
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
@@ -88,6 +88,7 @@ private:
     AP_Int8 _ENABLE_TURN;
     AP_Float _WING_SPAN;
     AP_Float _VERT_SPD;
+
 
     AP_PIDInfo _pid_info;
 

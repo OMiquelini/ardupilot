@@ -228,6 +228,7 @@ void GroundEffectController::cruise(uint32_t time) {
 
     return;
 }
+GroundEffectController *GroundEffectController::_singleton;
 
 void GroundEffectController::land_seq() {
     // float _vert_spd_aimed = (float(_VERT_SPD) / 50);

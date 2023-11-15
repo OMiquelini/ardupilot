@@ -78,7 +78,6 @@ void ModeAuto::update()
         return;
     }
 #endif
-
     if (nav_cmd_id == MAV_CMD_NAV_TAKEOFF ||
         (nav_cmd_id == MAV_CMD_NAV_LAND && plane.flight_stage == AP_FixedWing::FlightStage::ABORT_LANDING)) {
         plane.takeoff_calc_roll();
@@ -111,12 +110,9 @@ void ModeAuto::update()
         if (nav_cmd_id != MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT) {
             plane.steer_state.hold_course_cd = -1;
         }
-        plane.g2.ground_effect_controller.update();
-        SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, plane.g2.ground_effect_controller.get_throttle());
-        plane.nav_pitch_cd = plane.g2.ground_effect_controller.get_pitch();
         plane.calc_nav_roll();
-        uint32_t roll_limit_cd = plane.g2.ground_effect_controller.get_auto_lim_roll_cd();
-        plane.nav_roll_cd = constrain_int32(plane.nav_roll_cd, -roll_limit_cd, roll_limit_cd);
+        plane.calc_nav_pitch();
+        plane.calc_throttle();
     }
 }
 
