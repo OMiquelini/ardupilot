@@ -31,11 +31,11 @@ public:
 
     bool enabled_by_user() { return _enabled; }
 
-    void update();
+    // void update();
 
     void land_seq();
 
-    void cruise(uint32_t time);
+    void cruise();
 
     void altitude_adjustment(float ref);
 
@@ -62,14 +62,6 @@ public:
     int32_t get_pitch() { return _pitch; }
 
     int16_t get_throttle() { return _throttle; }
-
-    void set_land_sequence_value(bool value) {
-        _land_sequence = value;
-    }
-
-    bool get_land_sequence_value() {
-        return _land_sequence;
-    }
 
     static GroundEffectController *get_singleton(void) { return _singleton; }
 
@@ -105,7 +97,6 @@ private:
     int32_t _pitch;
     int16_t _throttle;
     int16_t _throttle_ant;
-    bool _land_sequence = false;
     //test-purpouse only
     int timer = 0;
 };

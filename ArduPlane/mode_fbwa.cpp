@@ -1,7 +1,10 @@
 #include "mode.h"
 #include "Plane.h"
 #include <GCS_MAVLink/GCS.h>
-bool message_sent = false;
+
+#ifndef message_sent
+    bool message_sent = false;
+#endif
 void ModeFBWA::update()
 {    
     // set nav_roll and nav_pitch using sticks
@@ -15,35 +18,27 @@ void ModeFBWA::update()
     }
     
 #if HAL_GROUND_EFFECT_ENABLED 
-    //leitura do canal do rádio configurado para aux_func efeito solo (175)
     RC_Channel *chan_gndef = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GROUND_EFFECT);
-
-    //verifica se o canal está configurado para efeito solo
     bool gndef_mode = chan_gndef->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
     
-    //se a chave estiver para baixo, realiza o voo em efeito solo, do contrario, voa com fbwa normalmente
+    RC_Channel *chan_land = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
+    bool land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+    
     if(gndef_mode){
         
-        //ajuste de altura de referencia com input do piloto (176)
         RC_Channel *chan_alt = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
         float pot_alt = chan_alt->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.altitude_adjustment(pot_alt);
-        
-        RC_Channel *chan_land = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
-        bool land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
-        plane.g2.ground_effect_controller.set_land_sequence_value(land);
 
-        //TODO: chave de velocidade ser a mesma de throttle
         float pot_spd = plane.channel_throttle->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
+        
+        if (land) { plane.g2.ground_effect_controller.cruise(); }
+        else { plane.g2.ground_effect_controller.cruise(); }
 
-        plane.g2.ground_effect_controller.update();
-
-        //Mensagem ao entrar em modo de efeito solo
-        if (message_sent==false)
+        if (message_sent == false)
         {
-            GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Ground effect enabled %s", message_sent ? "true" : "false");
-            message_sent=true;
+            message_sent = true;
             GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Ground effect enabled %s", message_sent ? "true" : "false");
         }
 
