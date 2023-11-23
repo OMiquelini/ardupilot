@@ -181,25 +181,8 @@ void GroundEffectController::speed_adjustment(float ref)
     return;
 }
 
-// void GroundEffectController::update()
-// {
-//     uint32_t time = AP_HAL::micros();
-//     if(time - _last_time_called > RESET_TIMEOUT_MICROS)
-//         reset();
-//     _last_time_called = time;
-
-//     if(_rangefinder->status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good) {
-//         if(_ENABLE_TURN)
-//             _last_good_rangefinder_reading = turn_correction();
-//         else
-//             _last_good_rangefinder_reading = _rangefinder->distance_orient(ROTATION_PITCH_270);
-//     }
-
-//     //Switch modes
-//     cruise(time);
-// }
-
-void GroundEffectController::cruise() {
+void GroundEffectController::update()
+{   
     uint32_t time = AP_HAL::micros();
     if(time - _last_time_called > RESET_TIMEOUT_MICROS)
         reset();
@@ -225,7 +208,10 @@ void GroundEffectController::cruise() {
         alt_error = _ALT_REF + alt_adjust - _last_good_rangefinder_reading;
     }
 
-    // Control pitch using altitude
+    if (_land) { land_seq(alt_error, airspeed_error); return; } else { cruise(alt_error, airspeed_error); return; }
+}
+
+void GroundEffectController::cruise(float alt_error, float airspeed_error) {
     _pitch = _pitch_pid.get_pid(alt_error);
 
     // Control throttle using airspeed
@@ -240,43 +226,15 @@ void GroundEffectController::cruise() {
     return;
 }
 
-void GroundEffectController::land_seq() {
-    uint32_t time = AP_HAL::micros();
-    if(time - _last_time_called > RESET_TIMEOUT_MICROS)
-        reset();
-    _last_time_called = time;
-
-    if(_rangefinder->status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good) {
-        if(_ENABLE_TURN)
-            _last_good_rangefinder_reading = turn_correction();
-        else
-            _last_good_rangefinder_reading = _rangefinder->distance_orient(ROTATION_PITCH_270);
-    }
-
-    float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
-
-    _ahrs->airspeed_estimate(airspeed_measured);
-    airspeed_error = spd_aimed - airspeed_measured;
-
-    // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
-    if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
-        _altFilter.apply(_last_good_rangefinder_reading, -ahrs_negative_alt, time);
-        alt_error = _ALT_REF + alt_adjust - _altFilter.get();
-    } else {
-        alt_error = _ALT_REF + alt_adjust - _last_good_rangefinder_reading;
-    }
-
-    // Control pitch using altitude
+void GroundEffectController::land_seq(float alt_error, float airspeed_error) {
     _pitch = _pitch_pid.get_pid(alt_error);
 
-    // Control throttle using airspeed
     _throttle_ant = _throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error);// + _THR_REF;
+    _throttle = _throttle_pid.get_pid(airspeed_error);
 
-    // Constrain throttle to min and max
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
 
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Aimed speed: %.2f %d",spd_aimed, _pitch);
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Aimed speed: %.2f %f",spd_aimed, sr);
 
     return;
 }

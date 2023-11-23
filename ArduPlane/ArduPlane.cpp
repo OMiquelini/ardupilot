@@ -564,6 +564,22 @@ void Plane::update_alt()
     }
 }
 
+void Plane::getSR(float &sinkRate) {
+    barometer.update();
+
+    // calculate the sink rate.
+    Vector3f vel;
+    if (ahrs.get_velocity_NED(vel)) {
+        sinkRate = vel.z;
+    } else if (gps.status() >= AP_GPS::GPS_OK_FIX_3D && gps.have_vertical_velocity()) {
+        sinkRate = gps.velocity().z;
+    } else {
+        sinkRate = -barometer.get_climb_rate();        
+    }
+
+    sinkRate = 0.8f * sinkRate + 0.2f*sinkRate;
+}
+
 /*
   recalculate the flight_stage
  */

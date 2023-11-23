@@ -23,7 +23,10 @@ void ModeFBWA::update()
     
     RC_Channel *chan_land = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
     bool land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
-    
+    if (land && !plane.g2.ground_effect_controller.get_land()) {
+        plane.g2.ground_effect_controller.set_land_true(land);
+    }
+
     if(gndef_mode){
         
         RC_Channel *chan_alt = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_POT_ALT);
@@ -33,11 +36,8 @@ void ModeFBWA::update()
         float pot_spd = plane.channel_throttle->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
         
-        // Problmea: se eu chamo o método cruise ou land_seq diretamente, os códigos funcionam corretamente
-        // mas por algum motivo quando eu coloco o if para verificar o estado da chave o fbwa é reiniciado a cada iteração e o código não funciona
-        // TODO: corrigir lógica da linguagem?
-        if (land) { plane.g2.ground_effect_controller.cruise(); }
-        else { plane.g2.ground_effect_controller.cruise(); }
+        plane.getSR(plane.g2.ground_effect_controller.sr);
+        plane.g2.ground_effect_controller.update();
 
         if (message_sent == false)
         {
