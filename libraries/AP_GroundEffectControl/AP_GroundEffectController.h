@@ -31,7 +31,11 @@ public:
 
     bool enabled_by_user() { return _enabled; }
 
-    void update();
+    void update(bool cmd_land);
+
+    void land(float alt_error, float airspeed_error);
+
+    void cruise(float alt_error, float airspeed_error);
 
     void altitude_adjustment(float ref);
 
@@ -45,9 +49,11 @@ public:
 
     void speed_adjustment(float ref);
 
-    float alt_adjust=0;
+    float alt_adjust = 0;
 
-    float spd_aimed=0;
+    float spd_aimed = 0;
+
+    float sr = 0;
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
 
@@ -75,6 +81,7 @@ private:
     AP_Float _AIMED_AIRSPEED;
     AP_Int8 _ENABLE_TURN;
     AP_Float _WING_SPAN;
+    AP_Float _VERT_SPD;
 
     AP_PIDInfo _pid_info;
 
@@ -92,7 +99,6 @@ private:
     int32_t _pitch;
     int16_t _throttle;
     int16_t _throttle_ant;
-
 };
 
 #endif // HAL_GROUND_EFFECT_ENABLED

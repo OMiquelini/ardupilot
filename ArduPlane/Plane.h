@@ -311,9 +311,6 @@ private:
     // last time we ran roll/pitch stabilization
     uint32_t last_stabilize_ms;
 
-    // This is used to enable the ground effect sub-mode of fbwa
-    bool ground_effect_submode;
-
     // Failsafe
     struct {
         // Used to track if the value on channel 3 (throtttle) has fallen below the failsafe threshold
@@ -1019,6 +1016,7 @@ private:
     void update_GPS_10Hz(void);
     void update_compass(void);
     void update_alt(void);
+    void getSR(float &sinkRate);
 #if AP_ADVANCEDFAILSAFE_ENABLED
     void afs_fs_check(void);
 #endif

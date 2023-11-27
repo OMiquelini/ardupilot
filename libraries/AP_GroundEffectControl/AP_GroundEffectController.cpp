@@ -110,6 +110,12 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     // @Description: Aircraft wing span to calculate max roll within ground effect flight to avoid touching the water
     AP_GROUPINFO("_WING_SPAN", 12, GroundEffectController, _WING_SPAN, 1),
 
+    // @Param; _VERT_SPD
+    // @DisplayName: Vertical Speed (m/s)
+    // @Description: Aimed vertical speed on landing
+    AP_GROUPINFO("_VERT_SPD", 13, GroundEffectController, _VERT_SPD, 1.5),
+
+
     AP_GROUPEND
 };
 
@@ -153,7 +159,7 @@ float GroundEffectController::turn_correction()
 
 void GroundEffectController::altitude_adjustment(float ref)
 {
-    alt_adjust = (ref+(1-_ahrs->cos_roll()))*0.5;
+    alt_adjust = (ref+(1-_ahrs->cos_roll()))*3;
     return;
 }
 
@@ -162,55 +168,37 @@ float GroundEffectController::get_max_roll()
     return safe_asin(turn_correction()/_WING_SPAN);
 }
 
-int GroundEffectController::turn_limit_on()
-{
-    if(_ENABLE_TURN)
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
-    }
+int GroundEffectController::turn_limit_on() {
+    return _ENABLE_TURN ? 1 : 0;
 }
 
 void GroundEffectController::speed_adjustment(float ref)
 {
     if(ref<=-0.850)
-    {
-        spd_aimed=0.0;
-    }
+        spd_aimed = 0.0;
     else
-    {
         spd_aimed = _AIMED_AIRSPEED+ref*3;
-    }
     return;
 }
 
-void GroundEffectController::update()
-{
+void GroundEffectController::update(bool cmd_land)
+{   
     uint32_t time = AP_HAL::micros();
-    if(time - _last_time_called > RESET_TIMEOUT_MICROS){
+    if(time - _last_time_called > RESET_TIMEOUT_MICROS)
         reset();
-    }
     _last_time_called = time;
 
     if(_rangefinder->status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good) {
         if(_ENABLE_TURN)
-        {
             _last_good_rangefinder_reading = turn_correction();
-        }
         else
-        {
             _last_good_rangefinder_reading = _rangefinder->distance_orient(ROTATION_PITCH_270);
-        }
     }
 
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
 
     _ahrs->airspeed_estimate(airspeed_measured);
     airspeed_error = spd_aimed - airspeed_measured;
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Aimed speed: %.2f",spd_aimed);
 
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
@@ -220,18 +208,39 @@ void GroundEffectController::update()
         alt_error = _ALT_REF + alt_adjust - _last_good_rangefinder_reading;
     }
 
-    // Control pitch using altitude
-    _pitch = _pitch_pid.get_pid(alt_error);
-
-    // Control throttle using airspeed
-    _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error);// + _THR_REF;
-
-    // Constrain throttle to min and max
-    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
-
+    if(!cmd_land) {
+        cruise(alt_error, airspeed_error);
+    } else {
+        land(alt_error, airspeed_error);
+    }
     return;
 }
+GroundEffectController *GroundEffectController::_singleton;
+
+void GroundEffectController::cruise(float alt_error, float airspeed_error) {
+    _pitch = _pitch_pid.get_pid(alt_error);
+
+
+    _throttle_ant = _throttle;
+    _throttle = _throttle_pid.get_pid(airspeed_error);
+
+    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"-Cruise- spd:%.2f throttle:%d",spd_aimed, _throttle);
+    return;
+}
+
+void GroundEffectController::land(float alt_error, float airspeed_error) {
+    float offset_vs = 3 * (float(_VERT_SPD) - sr);
+    _pitch = 0;
+
+    _throttle_ant = _throttle;
+    _throttle = _throttle_pid.get_pid(airspeed_error - offset_vs);
+
+    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"-Land- offset:%.2f sr:%f _throttle:%d aspd_error:%f", offset_vs, sr, _throttle, airspeed_error);
+    return;
+}
+
 GroundEffectController *GroundEffectController::_singleton;
 
 #endif // HAL_GROUND_EFFECT_ENABLED

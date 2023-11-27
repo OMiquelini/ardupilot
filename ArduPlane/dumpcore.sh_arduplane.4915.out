@@ -1,0 +1,11 @@
+[New Thread 5216.0x7f8c]
+[New Thread 5216.0x6098]
+[New Thread 5216.0x9d5c]
+[New Thread 5216.0x608c]
+[New Thread 5216.0x8b58]
+[New Thread 5216.0x2ab8]
+[New Thread 5216.0x11c8]
+warning: cannot close "ap-4923.core": invalid operation
+/tmp/gdb.4923:2: Error in sourced command file:
+Can't create a corefile
+[Inferior 1 (process 5216) detached]

@@ -653,6 +653,9 @@ void RC_Channel::init_aux_function(const aux_func_t ch_option, const AuxSwitchPo
     case AUX_FUNC::SCRIPTING_6:
     case AUX_FUNC::SCRIPTING_7:
     case AUX_FUNC::SCRIPTING_8:
+    case AUX_FUNC::GROUND_EFFECT:
+    case AUX_FUNC::GNDEF_POT_ALT:
+    case AUX_FUNC::GNDEF_LAND:
 #if AP_VIDEOTX_ENABLED
     case AUX_FUNC::VTX_POWER:
 #endif
@@ -1624,7 +1627,7 @@ bool RC_Channel::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos 
         break;
     case AUX_FUNC::GROUND_EFFECT:
     case AUX_FUNC::GNDEF_POT_ALT:
-    case AUX_FUNC::GNDEF_POT_SPD:
+    case AUX_FUNC::GNDEF_LAND:
     case AUX_FUNC::LOWEHEISER_THROTTLE:
     case AUX_FUNC::LOWEHEISER_STARTER:
         // monitored by the library itself
