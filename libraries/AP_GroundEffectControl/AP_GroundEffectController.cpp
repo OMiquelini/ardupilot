@@ -159,7 +159,7 @@ float GroundEffectController::turn_correction()
 
 void GroundEffectController::altitude_adjustment(float ref)
 {
-    alt_adjust = (ref+(1-_ahrs->cos_roll()))*0.5;
+    alt_adjust = (ref+(1-_ahrs->cos_roll()))*3;
     return;
 }
 
@@ -181,7 +181,7 @@ void GroundEffectController::speed_adjustment(float ref)
     return;
 }
 
-void GroundEffectController::update()
+void GroundEffectController::update(bool cmd_land)
 {   
     uint32_t time = AP_HAL::micros();
     if(time - _last_time_called > RESET_TIMEOUT_MICROS)
@@ -208,34 +208,35 @@ void GroundEffectController::update()
         alt_error = _ALT_REF + alt_adjust - _last_good_rangefinder_reading;
     }
 
-    if (_land) { land_seq(alt_error, airspeed_error); return; } else { cruise(alt_error, airspeed_error); return; }
+    if(!cmd_land) {
+        cruise(alt_error, airspeed_error);
+    } else {
+        land(alt_error, airspeed_error);
+    }
+    return;
 }
 
 void GroundEffectController::cruise(float alt_error, float airspeed_error) {
     _pitch = _pitch_pid.get_pid(alt_error);
 
-    // Control throttle using airspeed
-    _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error);// + _THR_REF;
-
-    // Constrain throttle to min and max
-    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
-
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Aimed speed: %.2f %d",spd_aimed, _throttle);
-
-    return;
-}
-
-void GroundEffectController::land_seq(float alt_error, float airspeed_error) {
-    _pitch = _pitch_pid.get_pid(alt_error);
 
     _throttle_ant = _throttle;
     _throttle = _throttle_pid.get_pid(airspeed_error);
 
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"-Cruise- spd:%.2f throttle:%d",spd_aimed, _throttle);
+    return;
+}
 
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Aimed speed: %.2f %f",spd_aimed, sr);
+void GroundEffectController::land(float alt_error, float airspeed_error) {
+    float offset_vs = 3 * (float(_VERT_SPD) - sr);
+    _pitch = 0;
 
+    _throttle_ant = _throttle;
+    _throttle = _throttle_pid.get_pid(airspeed_error - offset_vs);
+
+    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"-Land- offset:%.2f sr:%f _throttle:%d aspd_error:%f", offset_vs, sr, _throttle, airspeed_error);
     return;
 }
 

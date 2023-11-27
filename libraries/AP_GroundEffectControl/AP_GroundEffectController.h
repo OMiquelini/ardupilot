@@ -31,9 +31,9 @@ public:
 
     bool enabled_by_user() { return _enabled; }
 
-    void update();
+    void update(bool cmd_land);
 
-    void land_seq(float alt_error, float airspeed_error);
+    void land(float alt_error, float airspeed_error);
 
     void cruise(float alt_error, float airspeed_error);
 
@@ -65,9 +65,6 @@ public:
 
     int16_t get_throttle() { return _throttle; }
 
-    void set_land_true(bool value) { _land = value; }
-
-    bool get_land() { return _land; }
     static GroundEffectController *get_singleton(void) { return _singleton; }
 
 private:
@@ -102,9 +99,6 @@ private:
     int32_t _pitch;
     int16_t _throttle;
     int16_t _throttle_ant;
-    //test-purpouse only
-    int timer = 0;
-    bool _land;
 };
 
 #endif // HAL_GROUND_EFFECT_ENABLED
