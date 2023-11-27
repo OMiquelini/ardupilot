@@ -1,9 +1,0 @@
-[New Thread 34284.0x6df8]
-[New Thread 34284.0x5830]
-[New Thread 34284.0x7d74]
-[New Thread 34284.0x7ef4]
-[New Thread 34284.0x5b84]
-warning: cannot close "ap-9889.core": invalid operation
-/tmp/gdb.9889:2: Error in sourced command file:
-Can't create a corefile
-[Inferior 1 (process 34284) detached]
