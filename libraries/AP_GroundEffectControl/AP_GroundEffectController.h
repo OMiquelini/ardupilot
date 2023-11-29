@@ -24,7 +24,7 @@ public:
         };
 
     /* Do not allow copies */
-    GroundEffectController(const GroundEffectController &other) = delete;
+    GroundEffectController (const GroundEffectController &other) = delete;
     GroundEffectController &operator=(const GroundEffectController&) = delete;
 
     bool user_request_enable(bool enable);
@@ -50,6 +50,8 @@ public:
     void speed_adjustment(float ref);
 
     float alt_adjust = 0;
+
+    float alt_aux=_ALT_REF;
 
     float spd_aimed = 0;
 

@@ -234,8 +234,25 @@ void GroundEffectController::cruise(float alt_error, float airspeed_error) {
 
 void GroundEffectController::land_seq(float alt_error, float airspeed_error) {
     float offset_vs = 3 * (_VERT_SPD-sr);
-
-    _pitch = -650;//_pitch_pid.get_pid(alt_error);
+    
+    if((alt_error-alt_aux)>=20)
+    {
+        alt_aux=alt_aux-(0.2/50);
+        alt_error-=alt_aux;
+        _pitch = _pitch_pid.get_pid(alt_error);
+    }
+    else
+    {
+        if(_pitch>-650)
+        {
+            _pitch-=6.5;
+        }
+        else
+        {
+            _pitch = -650;
+        }
+    }
+    
 
     _throttle = _throttle_pid.get_pid(airspeed_error + offset_vs);
 
