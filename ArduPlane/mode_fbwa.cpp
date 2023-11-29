@@ -6,6 +6,12 @@
     bool message_sent = false;
 #endif
 
+bool ModeFBWA::_enter() {
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Entrei");
+
+    return true;
+}
+
 void ModeFBWA::update() {    
     // set nav_roll and nav_pitch using sticks
     plane.nav_roll_cd  = plane.channel_roll->norm_input() * plane.roll_limit_cd;
@@ -31,9 +37,9 @@ void ModeFBWA::update() {
         plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
         
         RC_Channel *chan_land = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
-        bool land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+        bool cmd_land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
         plane.getSR(plane.g2.ground_effect_controller.sr);
-        plane.g2.ground_effect_controller.update(land);
+        plane.g2.ground_effect_controller.update(cmd_land);
 
         if (message_sent == false)
         {

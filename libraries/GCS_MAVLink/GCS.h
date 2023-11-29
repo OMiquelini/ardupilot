@@ -330,6 +330,13 @@ public:
     void send_meminfo(void);
     void send_fence_status() const;
     void send_power_status(void);
+
+    //--- AeroRiver --- //
+    void handle_msg_aeroriver_geral(const mavlink_message_t &msg) const;
+    void handle_msg_aeroriver_lidar(const mavlink_message_t &msg) const;
+    void handle_msg_aeroriver_probe(const mavlink_message_t &msg) const;
+    void handle_msg_aeroriver_can(const mavlink_message_t &msg) const;
+
 #if HAL_WITH_MCU_MONITORING
     void send_mcu_status(void);
 #endif

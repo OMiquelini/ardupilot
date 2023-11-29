@@ -159,7 +159,7 @@ float GroundEffectController::turn_correction()
 
 void GroundEffectController::altitude_adjustment(float ref)
 {
-    alt_adjust = (ref+(1-_ahrs->cos_roll()))*0.5;
+    alt_adjust = (ref+(1-_ahrs->cos_roll()))*3;
     return;
 }
 
@@ -181,7 +181,7 @@ void GroundEffectController::speed_adjustment(float ref)
     return;
 }
 
-void GroundEffectController::update(bool land)
+void GroundEffectController::update(bool cmd_land)
 {   
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
 
@@ -220,6 +220,7 @@ void GroundEffectController::update(bool land)
     }
     return;
 }
+GroundEffectController *GroundEffectController::_singleton;
 
 void GroundEffectController::cruise(float alt_error, float airspeed_error) {
     
@@ -232,15 +233,16 @@ void GroundEffectController::cruise(float alt_error, float airspeed_error) {
     return;
 }
 
+
 void GroundEffectController::land_seq(float alt_error, float airspeed_error) {
-    float offset_vs = 3 * (_VERT_SPD-sr);
+    float offset_vs = 3 * (float(_VERT_SPD) - sr);
+    _pitch = 0;
 
-    _pitch = -650;//_pitch_pid.get_pid(alt_error);
-
-    _throttle = _throttle_pid.get_pid(airspeed_error + offset_vs);
+    _throttle_ant = _throttle;
+    _throttle = _throttle_pid.get_pid(airspeed_error - offset_vs);
 
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"--Landing-- Aimed speed: %.2f Pitch: %f",spd_aimed, sr);
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"-Land- offset:%.2f sr:%f _throttle:%d aspd_error:%f", offset_vs, sr, _throttle, airspeed_error);
     return;
 }
 

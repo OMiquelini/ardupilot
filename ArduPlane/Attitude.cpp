@@ -640,7 +640,7 @@ void Plane::update_load_factor(void)
 #endif
 
 #if HAL_GROUND_EFFECT_ENABLED
-        // limit roll when in ground effec
+        // limit roll when in ground effect
         if(g2.ground_effect_controller.turn_limit_on())
         {
             nav_roll_cd = constrain_int32(nav_roll_cd, -g2.ground_effect_controller.get_auto_lim_roll_cd(), g2.ground_effect_controller.get_auto_lim_roll_cd());

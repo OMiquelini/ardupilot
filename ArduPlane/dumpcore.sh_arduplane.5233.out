@@ -1,9 +1,0 @@
-[New Thread 10484.0x58ec]
-[New Thread 10484.0x212c]
-[New Thread 10484.0x3710]
-[New Thread 10484.0x9d5c]
-[New Thread 10484.0x6134]
-warning: cannot close "ap-5241.core": invalid operation
-/tmp/gdb.5241:2: Error in sourced command file:
-Can't create a corefile
-[Inferior 1 (process 10484) detached]
