@@ -31,7 +31,7 @@ public:
 
     bool enabled_by_user() { return _enabled; }
 
-    void update();
+    void update(bool land);
 
     void land_seq(float alt_error, float airspeed_error);
 
@@ -101,7 +101,6 @@ private:
     bool _enabled;
     int32_t _pitch;
     int16_t _throttle;
-    int16_t _throttle_ant;
     //test-purpouse only
     int timer = 0;
     bool _land;

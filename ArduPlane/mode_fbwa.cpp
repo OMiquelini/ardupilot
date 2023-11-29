@@ -5,8 +5,8 @@
 #ifndef message_sent
     bool message_sent = false;
 #endif
-void ModeFBWA::update()
-{    
+
+void ModeFBWA::update() {    
     // set nav_roll and nav_pitch using sticks
     plane.nav_roll_cd  = plane.channel_roll->norm_input() * plane.roll_limit_cd;
     plane.update_load_factor();
@@ -20,12 +20,6 @@ void ModeFBWA::update()
 #if HAL_GROUND_EFFECT_ENABLED 
     RC_Channel *chan_gndef = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GROUND_EFFECT);
     bool gndef_mode = chan_gndef->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
-    
-    RC_Channel *chan_land = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
-    bool land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
-    if (land && !plane.g2.ground_effect_controller.get_land()) {
-        plane.g2.ground_effect_controller.set_land_true(land);
-    }
 
     if(gndef_mode){
         
@@ -36,8 +30,10 @@ void ModeFBWA::update()
         float pot_spd = plane.channel_throttle->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
         
+        RC_Channel *chan_land = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
+        bool land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
         plane.getSR(plane.g2.ground_effect_controller.sr);
-        plane.g2.ground_effect_controller.update();
+        plane.g2.ground_effect_controller.update(land);
 
         if (message_sent == false)
         {

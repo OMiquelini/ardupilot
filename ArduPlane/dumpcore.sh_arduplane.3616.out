@@ -1,0 +1,11 @@
+[New Thread 10504.0xee8c]
+[New Thread 10504.0xd170]
+[New Thread 10504.0x49bc]
+[New Thread 10504.0xa9e8]
+[New Thread 10504.0xec20]
+[New Thread 10504.0xefbc]
+[New Thread 10504.0x1bd0]
+warning: cannot close "ap-3624.core": invalid operation
+/tmp/gdb.3624:2: Error in sourced command file:
+Can't create a corefile
+[Inferior 1 (process 10504) detached]
