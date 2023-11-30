@@ -31,10 +31,9 @@ public:
 
     bool enabled_by_user() { return _enabled; }
 
+    void update(bool land);
 
-    void update(bool cmd_land);
-
-    void land(float alt_error, float airspeed_error);
+    void land_seq(float alt_error, float airspeed_error);
 
     void cruise(float alt_error, float airspeed_error);
 
@@ -85,10 +84,9 @@ private:
     AP_Int8 _ENABLE_TURN;
     AP_Float _WING_SPAN;
     AP_Float _VERT_SPD;
-
+    AP_Float _FLARE_ANG;
+    
     AP_PIDInfo _pid_info;
-
-    static GroundEffectController *_singleton;
 
     uint32_t _last_time_called;
 
@@ -101,7 +99,10 @@ private:
     bool _enabled;
     int32_t _pitch;
     int16_t _throttle;
-    int16_t _throttle_ant;
+    int16_t pwmMin = 1000;
+    int16_t pwmMax = 1900;
+    
+    static GroundEffectController *_singleton;
 };
 
 #endif // HAL_GROUND_EFFECT_ENABLED

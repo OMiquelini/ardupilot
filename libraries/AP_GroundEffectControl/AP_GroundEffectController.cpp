@@ -115,6 +115,10 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     // @Description: Aimed vertical speed on landing
     AP_GROUPINFO("_VERT_SPD", 13, GroundEffectController, _VERT_SPD, 1.5),
 
+    // @Param; _FLARE_ANG
+    // @DisplayName: Flare angle in degrees * 100
+    // @Description: Aimed flare angle on landing
+    AP_GROUPINFO("_FLARE_ANG", 14, GroundEffectController, _FLARE_ANG, 650),
 
     AP_GROUPEND
 };
@@ -159,7 +163,7 @@ float GroundEffectController::turn_correction()
 
 void GroundEffectController::altitude_adjustment(float ref)
 {
-    alt_adjust = (ref+(1-_ahrs->cos_roll()))*3;
+    alt_adjust = (ref+(1-_ahrs->cos_roll()))*0.5;
     return;
 }
 
@@ -181,7 +185,7 @@ void GroundEffectController::speed_adjustment(float ref)
     return;
 }
 
-void GroundEffectController::update(bool cmd_land)
+void GroundEffectController::update(bool land)
 {   
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
 
@@ -220,29 +224,32 @@ void GroundEffectController::update(bool cmd_land)
     }
     return;
 }
-GroundEffectController *GroundEffectController::_singleton;
 
 void GroundEffectController::cruise(float alt_error, float airspeed_error) {
     
     _pitch = _pitch_pid.get_pid(alt_error);
 
-    _throttle = _throttle_pid.get_pid(airspeed_error);
+    int aux_throttle = _throttle_pid.get_pid(airspeed_error);
 
-    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
+    aux_throttle = constrain_int16(aux_throttle, _THR_MIN, _THR_MAX);
+    
+    _throttle = pwmMin + (aux_throttle * (pwmMax - pwmMin) / 100);
     GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"--Cruise-- Aimed speed: %.2f Throttle: %d",spd_aimed, _throttle);
     return;
 }
 
-
 void GroundEffectController::land_seq(float alt_error, float airspeed_error) {
-    float offset_vs = 3 * (float(_VERT_SPD) - sr);
-    _pitch = 0;
+    
+    float offset_vs = 3 * (_VERT_SPD - sr);
 
-    _throttle_ant = _throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error - offset_vs);
+    _pitch = 100;
 
-    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"-Land- offset:%.2f sr:%f _throttle:%d aspd_error:%f", offset_vs, sr, _throttle, airspeed_error);
+    int aux_throttle = _throttle_pid.get_pid(airspeed_error - offset_vs);
+
+    aux_throttle = constrain_int16(aux_throttle, _THR_MIN, _THR_MAX);
+    
+    _throttle = pwmMin + (aux_throttle * (pwmMax - pwmMin) / 100);
+    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"--Landing-- Aimed speed: %.2f Pitch: %d",spd_aimed, _pitch);
     return;
 }
 

@@ -6,12 +6,6 @@
     bool message_sent = false;
 #endif
 
-bool ModeFBWA::_enter() {
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Entrei");
-
-    return true;
-}
-
 void ModeFBWA::update() {    
     // set nav_roll and nav_pitch using sticks
     plane.nav_roll_cd  = plane.channel_roll->norm_input() * plane.roll_limit_cd;
@@ -37,9 +31,9 @@ void ModeFBWA::update() {
         plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
         
         RC_Channel *chan_land = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
-        bool cmd_land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+        bool land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
         plane.getSR(plane.g2.ground_effect_controller.sr);
-        plane.g2.ground_effect_controller.update(cmd_land);
+        plane.g2.ground_effect_controller.update(land);
 
         if (message_sent == false)
         {
@@ -48,40 +42,43 @@ void ModeFBWA::update() {
         }
 
         // Se o controle estiver com throttle em 0, ignora o valor do controlador pid e escreve throttle = 0
-        if(plane.channel_throttle->in_trim_dz()){
-            SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, 0);
-        } else {
-            float gnd_throttle=plane.g2.ground_effect_controller.get_throttle();
-            SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, gnd_throttle);
-        }
+        // if(plane.channel_throttle->in_trim_dz()){
+        //     SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, 0);
+        // } else {
+        // RC_Channel *chan_throttle = rc().find_channel_for_option(RC_Channel::AUX_FUNC::THROTTLE);
+        int16_t gnd_throttle = plane.g2.ground_effect_controller.get_throttle();
+        plane.channel_throttle->set_radio_in(gnd_throttle);
+        GCS_SEND_TEXT(MAV_SEVERITY_WARNING, "pwm: %d", plane.channel_throttle->get_radio_in());
+        // }
 
-        plane.nav_pitch_cd += plane.g2.ground_effect_controller.get_pitch(); // Note that this stacks
+        // plane.nav_pitch_cd += plane.g2.ground_effect_controller.get_pitch(); // Note that this stacks
+        plane.nav_pitch_cd = plane.g2.ground_effect_controller.get_pitch();
     } else {
 #endif
-        plane.adjust_nav_pitch_throttle();
+        // plane.adjust_nav_pitch_throttle();
         message_sent=false;
 #if HAL_GROUND_EFFECT_ENABLED 
     }
 #endif
-    plane.nav_pitch_cd = constrain_int32(plane.nav_pitch_cd, plane.pitch_limit_min_cd, plane.aparm.pitch_limit_max_cd.get());
-    if (plane.fly_inverted()) {
-        plane.nav_pitch_cd = -plane.nav_pitch_cd;
-    }
-    if (plane.failsafe.rc_failsafe && plane.g.fs_action_short == FS_ACTION_SHORT_FBWA) {
-        // FBWA failsafe glide
-        plane.nav_roll_cd = 0;
-        plane.nav_pitch_cd = 0;
-        SRV_Channels::set_output_limit(SRV_Channel::k_throttle, SRV_Channel::Limit::MIN);
-    }
-    RC_Channel *chan = rc().find_channel_for_option(RC_Channel::AUX_FUNC::FBWA_TAILDRAGGER);
-    if (chan != nullptr) {
-        // check for the user enabling FBWA taildrag takeoff mode
-        bool tdrag_mode = chan->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
-        if (tdrag_mode && !plane.auto_state.fbwa_tdrag_takeoff_mode) {
-            if (plane.auto_state.highest_airspeed < plane.g.takeoff_tdrag_speed1) {
-                plane.auto_state.fbwa_tdrag_takeoff_mode = true;
-                plane.gcs().send_text(MAV_SEVERITY_WARNING, "FBWA tdrag mode");
-            }
-        }
-    }
+    // plane.nav_pitch_cd = constrain_int32(plane.nav_pitch_cd, plane.pitch_limit_min_cd, plane.aparm.pitch_limit_max_cd.get());
+    // if (plane.fly_inverted()) {
+    //     plane.nav_pitch_cd = -plane.nav_pitch_cd;
+    // }
+    // if (plane.failsafe.rc_failsafe && plane.g.fs_action_short == FS_ACTION_SHORT_FBWA) {
+    //     // FBWA failsafe glide
+    //     plane.nav_roll_cd = 0;
+    //     plane.nav_pitch_cd = 0;
+    //     SRV_Channels::set_output_limit(SRV_Channel::k_throttle, SRV_Channel::Limit::MIN);
+    // }
+    // RC_Channel *chan = rc().find_channel_for_option(RC_Channel::AUX_FUNC::FBWA_TAILDRAGGER);
+    // if (chan != nullptr) {
+    //     // check for the user enabling FBWA taildrag takeoff mode
+    //     bool tdrag_mode = chan->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+    //     if (tdrag_mode && !plane.auto_state.fbwa_tdrag_takeoff_mode) {
+    //         if (plane.auto_state.highest_airspeed < plane.g.takeoff_tdrag_speed1) {
+    //             plane.auto_state.fbwa_tdrag_takeoff_mode = true;
+    //             plane.gcs().send_text(MAV_SEVERITY_WARNING, "FBWA tdrag mode");
+    //         }
+    //     }
+    // }
 }
