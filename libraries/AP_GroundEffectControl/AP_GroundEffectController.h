@@ -44,6 +44,8 @@ public:
     int turn_limit_on();
 
     void speed_adjustment(float ref);
+    
+    bool throttle_ctrl_enabled();
 
     float alt_adjust=0;
 
@@ -75,6 +77,8 @@ private:
     AP_Float _AIMED_AIRSPEED;
     AP_Int8 _ENABLE_TURN;
     AP_Float _WING_SPAN;
+    AP_Float _SPD_PARAM;
+    AP_Int8 _ENABLE_THR;
 
     AP_PIDInfo _pid_info;
 

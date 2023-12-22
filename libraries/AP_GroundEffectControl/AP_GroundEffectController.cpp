@@ -110,6 +110,12 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     // @Description: Aircraft wing span to calculate max roll within ground effect flight to avoid touching the water
     AP_GROUPINFO("_WING_SPAN", 12, GroundEffectController, _WING_SPAN, 1),
 
+    // @Param: _SPD_PARAM
+    //@Description:
+    AP_GROUPINFO("_SPD_PARAM", 13, GroundEffectController, _SPD_PARAM, 1),
+
+    AP_GROUPINFO("_ENABLE_THR", 14, GroundEffectController, _ENABLE_THR, 0),
+
     AP_GROUPEND
 };
 
@@ -159,7 +165,7 @@ void GroundEffectController::altitude_adjustment(float ref)
 
 float GroundEffectController::get_max_roll()
 {
-    return safe_asin(turn_correction()/_WING_SPAN);
+    return MAX(((safe_asin(turn_correction()/_WING_SPAN))*(180/3.141592))-1, 0);
 }
 
 int GroundEffectController::turn_limit_on()
@@ -176,15 +182,16 @@ int GroundEffectController::turn_limit_on()
 
 void GroundEffectController::speed_adjustment(float ref)
 {
-    if(ref<=-0.850)
-    {
-        spd_aimed=0.0;
-    }
-    else
-    {
-        spd_aimed = _AIMED_AIRSPEED+ref*3;
-    }
+    spd_aimed = _AIMED_AIRSPEED+ref*_SPD_PARAM;
     return;
+}
+
+bool GroundEffectController::throttle_ctrl_enabled()
+{
+    if(_ENABLE_THR)
+        return true;
+    else
+        return false;
 }
 
 void GroundEffectController::update()
@@ -195,7 +202,8 @@ void GroundEffectController::update()
     }
     _last_time_called = time;
 
-    if(_rangefinder->status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good) {
+    if(_rangefinder->status_orient(ROTATION_PITCH_270) == RangeFinder::Status::Good)
+    {
         if(_ENABLE_TURN)
         {
             _last_good_rangefinder_reading = turn_correction();
@@ -205,12 +213,17 @@ void GroundEffectController::update()
             _last_good_rangefinder_reading = _rangefinder->distance_orient(ROTATION_PITCH_270);
         }
     }
-
+    
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
-
-    _ahrs->airspeed_estimate(airspeed_measured);
-    airspeed_error = spd_aimed - airspeed_measured;
-    GCS_SEND_TEXT(MAV_SEVERITY_WARNING,"Aimed speed: %.2f",spd_aimed);
+    if(_ahrs->airspeed_estimate(airspeed_measured))
+    {
+        airspeed_error = spd_aimed - airspeed_measured;
+    }
+    else
+    {
+    GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"AIRSPEED RUIM");
+    airspeed_error = 0;
+    }
 
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
@@ -225,7 +238,7 @@ void GroundEffectController::update()
 
     // Control throttle using airspeed
     _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error);// + _THR_REF;
+    _throttle = _throttle_pid.get_pid(airspeed_error);
 
     // Constrain throttle to min and max
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);

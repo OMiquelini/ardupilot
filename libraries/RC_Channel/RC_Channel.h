@@ -250,6 +250,7 @@ public:
         GROUND_EFFECT           = 175, // Use ground effect controller in FBWA
         GNDEF_POT_ALT           = 176, // Potenciometro para ajustar altura de referencia
         GNDEF_POT_SPD           = 177, // Potenciometro para ajustar velocidade de referencia
+        GNDEF_LAND              =178,
 
 
         // inputs from 200 will eventually used to replace RCMAP

@@ -641,7 +641,7 @@ float RangeFinder::distance_orient(enum Rotation orientation) const
     if (backend == nullptr) {
         return 0;
     }
-    return backend->distance();//tentativa de correção
+    return backend->distance();
 }
 
 uint16_t RangeFinder::distance_cm_orient(enum Rotation orientation) const

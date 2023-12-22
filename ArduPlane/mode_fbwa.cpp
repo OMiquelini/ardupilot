@@ -29,7 +29,6 @@ void ModeFBWA::update()
         float pot_alt = chan_alt->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.altitude_adjustment(pot_alt);
 
-        //TODO: chave de velocidade ser a mesma de throttle
         float pot_spd = plane.channel_throttle->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
 
@@ -46,8 +45,15 @@ void ModeFBWA::update()
         if(plane.channel_throttle->in_trim_dz()){
             SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, 0);
         } else {
-            float gnd_throttle=plane.g2.ground_effect_controller.get_throttle();
-            SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, gnd_throttle);
+            if(plane.g2.ground_effect_controller.throttle_ctrl_enabled())
+            {
+                float gnd_throttle=plane.g2.ground_effect_controller.get_throttle();
+                SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, gnd_throttle);
+            }
+            else
+            {
+                SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, plane.channel_throttle->percent_input());
+            }
         }
 
         plane.nav_pitch_cd += plane.g2.ground_effect_controller.get_pitch(); // Note that this stacks
