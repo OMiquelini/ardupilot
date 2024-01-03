@@ -116,6 +116,16 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
 
     AP_GROUPINFO("_ENABLE_THR", 14, GroundEffectController, _ENABLE_THR, 0),
 
+    // @Param; _VERT_SPD
+    // @DisplayName: Vertical Speed (m/s)
+    // @Description: Aimed vertical speed on landing
+    AP_GROUPINFO("_VERT_SPD", 15, GroundEffectController, _VERT_SPD, 1.5),
+
+    // @Param; _FLARE_ANG
+    // @DisplayName: Flare angle in degrees * 100
+    // @Description: Aimed flare angle on landing
+    AP_GROUPINFO("_FLARE_ANG", 16, GroundEffectController, _FLARE_ANG, 650),
+
     AP_GROUPEND
 };
 
@@ -194,7 +204,41 @@ bool GroundEffectController::throttle_ctrl_enabled()
         return false;
 }
 
-void GroundEffectController::update()
+//TODO
+void GroundEffectController::cruise(float alt_error, float airspeed_error, float reading)
+{
+    _pitch = _pitch_pid.get_pid(alt_error);
+
+    _throttle = _throttle_pid.get_pid(airspeed_error);
+
+    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
+    
+    return;
+}
+
+//TODO
+void GroundEffectController::land_seq(float alt_error, float airspeed_error, float reading)
+{
+    float offset_vs = 3 * (_VERT_SPD - sr);
+    if(reading >=10)
+    {
+        alt_error_aux+=0.025;
+        _pitch=_pitch_pid.get_pid(alt_error-alt_error_aux);
+    }
+    else
+    {
+        alt_error_aux=0;
+        _pitch = _FLARE_ANG*100;
+    }
+
+    _throttle = _throttle_pid.get_pid(airspeed_error - offset_vs);
+
+    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
+    
+    return;
+}
+
+void GroundEffectController::update(bool land)
 {
     uint32_t time = AP_HAL::micros();
     if(time - _last_time_called > RESET_TIMEOUT_MICROS){
@@ -214,7 +258,7 @@ void GroundEffectController::update()
         }
     }
     
-    float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error;
+    float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error, reading;
     if(_ahrs->airspeed_estimate(airspeed_measured))
     {
         airspeed_error = spd_aimed - airspeed_measured;
@@ -228,21 +272,23 @@ void GroundEffectController::update()
     // DCM altitude is not good. If EKF alt is not available, just use raw rangefinder data
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
         _altFilter.apply(_last_good_rangefinder_reading, -ahrs_negative_alt, time);
+        reading=_altFilter.get();
         alt_error = _ALT_REF + alt_adjust - _altFilter.get();
     } else {
+        reading=_last_good_rangefinder_reading;
         alt_error = _ALT_REF + alt_adjust - _last_good_rangefinder_reading;
     }
 
-    // Control pitch using altitude
-    _pitch = _pitch_pid.get_pid(alt_error);
-
-    // Control throttle using airspeed
-    _throttle_ant=_throttle;
-    _throttle = _throttle_pid.get_pid(airspeed_error);
-
-    // Constrain throttle to min and max
-    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
-
+    //update pitch and throttle, land or cruise
+    if(!land) {
+        //takeoff and cruise
+        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"CRUISE");
+        cruise(alt_error, airspeed_error, reading);
+    } else {
+        //land
+        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"LAND");
+        land_seq(alt_error, airspeed_error, reading);
+    }
     return;
 }
 GroundEffectController *GroundEffectController::_singleton;

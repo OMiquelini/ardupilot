@@ -32,7 +32,10 @@ void ModeFBWA::update()
         float pot_spd = plane.channel_throttle->norm_input_ignore_trim();
         plane.g2.ground_effect_controller.speed_adjustment(pot_spd);
 
-        plane.g2.ground_effect_controller.update();
+
+        RC_Channel *chan_land = rc().find_channel_for_option(RC_Channel::AUX_FUNC::GNDEF_LAND);
+        bool land = chan_land->get_aux_switch_pos() == RC_Channel::AuxSwitchPos::HIGH;
+        plane.g2.ground_effect_controller.update(land);
 
         //Mensagem ao entrar em modo de efeito solo
         if (message_sent==false)

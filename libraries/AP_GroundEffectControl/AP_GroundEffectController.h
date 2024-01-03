@@ -31,7 +31,7 @@ public:
 
     bool enabled_by_user() { return _enabled; }
 
-    void update();
+    void update(bool land);
 
     void altitude_adjustment(float ref);
 
@@ -47,9 +47,17 @@ public:
     
     bool throttle_ctrl_enabled();
 
+    void cruise(float alt_error, float airspeed_error, float reading);
+
+    void land_seq(float alt_error, float airspeed_error, float reading);
+
     float alt_adjust=0;
 
     float spd_aimed=0;
+
+    float sr = 0;
+
+    float alt_error_aux = 0;
 
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
 
@@ -79,6 +87,8 @@ private:
     AP_Float _WING_SPAN;
     AP_Float _SPD_PARAM;
     AP_Int8 _ENABLE_THR;
+    AP_Float _VERT_SPD;
+    AP_Float _FLARE_ANG;
 
     AP_PIDInfo _pid_info;
 
