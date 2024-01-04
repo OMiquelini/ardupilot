@@ -211,26 +211,26 @@ void GroundEffectController::cruise(float alt_error, float airspeed_error, float
 
 void GroundEffectController::land_seq(float alt_error, float airspeed_error, float reading)
 {
-    if(reading>1)
+    if(reading>1)//caso a altitude atual seja maior que 1 metro, o comando de land é ignorado e o voo continua em cruise, até que a altitude diminua
     {
+        spd_error_aux=0; //variável auxiliar para reduzir a velocidade alvo para cada iteração da função, aqui está sendo resetada para evitar que assuma valores muito altos
+        alt_error_aux=0; //variável auxiliar para reduzir a altitude alvo para cada iteração da função, aqui está sendo resetada para evitar que assuma valores muito altos       
         cruise(alt_error, airspeed_error, reading);
-        alt_error_aux=0;
-        spd_error_aux=0;
     }
-    else if(reading >=0.15 && reading <=1)
+    else if(reading >=0.15 && reading <=1)//caso a altitude esteja entre 15 cm e 1 m, começa sequencia de pouso, diminuindo a altitude e velocidade alvo gradativamente
     {
-        alt_error_aux+=0.020;
-        spd_error_aux+=0.020;
+        alt_error_aux+=0.005;//para cada iteração da função land_seq, a altitude alvo é diminuida em 0,5 cm, assim, totalizando 0,25 m/s
+        spd_error_aux+=0.02;//para cada iteração da função, a velocidade alvo é diminuida em 0,02 m, totalizando 1m/s
         _pitch=_pitch_pid.get_pid(alt_error-alt_error_aux);
         _throttle = _throttle_pid.get_pid(airspeed_error+spd_error_aux);
         _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
     }
-    else
+    else//caso a altitude seja menor que 15 cm, executa o flare e diminui o throttle para o mínimo programado
     {
-        alt_error_aux=0;
-        spd_error_aux=0;
-        _pitch = _FLARE_ANG;
-        _throttle = _THR_MIN;
+        alt_error_aux=0;//reset na variável auxiliar de altitude
+        spd_error_aux=0;//reset na variável auxiliar de velocidade
+        _pitch = _FLARE_ANG*100;//flare de acordo com o ângulo nos parâmetros
+        _throttle = _THR_MIN;//throttle mínimo
     }
     
     return;
@@ -269,10 +269,10 @@ void GroundEffectController::update(bool land)
     if(_ahrs->get_active_AHRS_type() > 0 && _ahrs->get_relative_position_D_origin(ahrs_negative_alt)){
         _altFilter.apply(_last_good_rangefinder_reading, -ahrs_negative_alt, time);
         reading=_altFilter.get();
-        alt_error = _ALT_REF + alt_adjust - _altFilter.get();
+        alt_error = _ALT_REF + alt_adjust - reading;
     } else {
         reading=_last_good_rangefinder_reading;
-        alt_error = _ALT_REF + alt_adjust - _last_good_rangefinder_reading;
+        alt_error = _ALT_REF + alt_adjust - reading;
     }
 
     //update pitch and throttle, land or cruise
