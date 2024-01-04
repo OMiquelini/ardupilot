@@ -181,13 +181,9 @@ float GroundEffectController::get_max_roll()
 int GroundEffectController::turn_limit_on()
 {
     if(_ENABLE_TURN)
-    {
         return 1;
-    }
     else
-    {
         return 0;
-    }
 }
 
 void GroundEffectController::speed_adjustment(float ref)
@@ -204,36 +200,38 @@ bool GroundEffectController::throttle_ctrl_enabled()
         return false;
 }
 
-//TODO
 void GroundEffectController::cruise(float alt_error, float airspeed_error, float reading)
 {
     _pitch = _pitch_pid.get_pid(alt_error);
-
     _throttle = _throttle_pid.get_pid(airspeed_error);
-
     _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
     
     return;
 }
 
-//TODO
 void GroundEffectController::land_seq(float alt_error, float airspeed_error, float reading)
 {
-    float offset_vs = 3 * (_VERT_SPD - sr);
-    if(reading >=10)
+    if(reading>1)
     {
-        alt_error_aux+=0.025;
+        cruise(alt_error, airspeed_error, reading);
+        alt_error_aux=0;
+        spd_error_aux=0;
+    }
+    else if(reading >=0.15 && reading <=1)
+    {
+        alt_error_aux+=0.020;
+        spd_error_aux+=0.020;
         _pitch=_pitch_pid.get_pid(alt_error-alt_error_aux);
+        _throttle = _throttle_pid.get_pid(airspeed_error+spd_error_aux);
+        _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
     }
     else
     {
         alt_error_aux=0;
-        _pitch = _FLARE_ANG*100;
+        spd_error_aux=0;
+        _pitch = _FLARE_ANG;
+        _throttle = _THR_MIN;
     }
-
-    _throttle = _throttle_pid.get_pid(airspeed_error - offset_vs);
-
-    _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
     
     return;
 }
@@ -260,9 +258,7 @@ void GroundEffectController::update(bool land)
     
     float alt_error, ahrs_negative_alt, airspeed_measured, airspeed_error, reading;
     if(_ahrs->airspeed_estimate(airspeed_measured))
-    {
         airspeed_error = spd_aimed - airspeed_measured;
-    }
     else
     {
     GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"AIRSPEED RUIM");
@@ -282,11 +278,9 @@ void GroundEffectController::update(bool land)
     //update pitch and throttle, land or cruise
     if(!land) {
         //takeoff and cruise
-        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"CRUISE");
         cruise(alt_error, airspeed_error, reading);
     } else {
         //land
-        //GCS_SEND_TEXT(MAV_SEVERITY_NOTICE,"LAND");
         land_seq(alt_error, airspeed_error, reading);
     }
     return;

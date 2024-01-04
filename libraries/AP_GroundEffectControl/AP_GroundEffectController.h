@@ -59,6 +59,8 @@ public:
 
     float alt_error_aux = 0;
 
+    float spd_error_aux = 0;
+
     const       AP_PIDInfo& get_pid_info(void) const { return _pid_info; }
 
 	static const struct AP_Param::GroupInfo var_info[];
