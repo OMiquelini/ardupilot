@@ -122,9 +122,20 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     AP_GROUPINFO("_VERT_SPD", 15, GroundEffectController, _VERT_SPD, 1.5),
 
     // @Param; _FLARE_ANG
-    // @DisplayName: Flare angle in degrees * 100
+    // @DisplayName: Flare angle in degrees
     // @Description: Aimed flare angle on landing
-    AP_GROUPINFO("_FLARE_ANG", 16, GroundEffectController, _FLARE_ANG, 650),
+    AP_GROUPINFO("_FLARE_ANG", 16, GroundEffectController, _FLARE_ANG, 6.5),
+
+    //DECREMENTO DA ALTITUDE ALVO POR LOOP DA LAND_SEQ
+    AP_GROUPINFO("_ALT_AUX", 17, GroundEffectController, _ALT_AUX, 0.005),
+
+    //DECREMENTO DA VELOCIDADE ALVO POR LOOP DA LAND_SEQ
+    AP_GROUPINFO("_SPD_AUX", 18, GroundEffectController, _SPD_AUX, 0.02),
+
+    AP_GROUPINFO("_MIN_LAND", 19, GroundEffectController, _MIN_LAND, 0.15),
+
+    AP_GROUPINFO("_MAX_LAND", 20, GroundEffectController, _MAX_LAND, 1),
+
 
     AP_GROUPEND
 };
@@ -217,10 +228,10 @@ void GroundEffectController::land_seq(float alt_error, float airspeed_error, flo
         alt_error_aux=0; //variável auxiliar para reduzir a altitude alvo para cada iteração da função, aqui está sendo resetada para evitar que assuma valores muito altos       
         cruise(alt_error, airspeed_error, reading);
     }
-    else if(reading >=0.15 && reading <=1)//caso a altitude esteja entre 15 cm e 1 m, começa sequencia de pouso, diminuindo a altitude e velocidade alvo gradativamente
+    else if(reading >=_MIN_LAND && reading <=_MAX_LAND)//caso a altitude esteja entre 15 cm e 1 m, começa sequencia de pouso, diminuindo a altitude e velocidade alvo gradativamente
     {
-        alt_error_aux+=0.005;//para cada iteração da função land_seq, a altitude alvo é diminuida em 0,5 cm, assim, totalizando 0,25 m/s
-        spd_error_aux+=0.02;//para cada iteração da função, a velocidade alvo é diminuida em 0,02 m, totalizando 1m/s
+        alt_error_aux+=_ALT_AUX;//para cada iteração da função land_seq, a altitude alvo é diminuida em 0,5 cm, assim, totalizando 0,25 m/s
+        spd_error_aux+=_SPD_AUX;//para cada iteração da função, a velocidade alvo é diminuida em 0,02 m, totalizando 1m/s
         _pitch=_pitch_pid.get_pid(alt_error-alt_error_aux);
         _throttle = _throttle_pid.get_pid(airspeed_error+spd_error_aux);
         _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);

@@ -91,6 +91,11 @@ private:
     AP_Int8 _ENABLE_THR;
     AP_Float _VERT_SPD;
     AP_Float _FLARE_ANG;
+    AP_Float _ALT_AUX;
+    AP_Float _SPD_AUX;
+    AP_Float _MIN_LAND;
+    AP_Float _MAX_LAND;
+
 
     AP_PIDInfo _pid_info;
 
