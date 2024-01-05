@@ -111,7 +111,7 @@ void ModeAuto::update()
         if (nav_cmd_id != MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT) {
             plane.steer_state.hold_course_cd = -1;
         }
-        plane.g2.ground_effect_controller.update();
+        plane.g2.ground_effect_controller.update(0);
         SRV_Channels::set_output_scaled(SRV_Channel::k_throttle, plane.g2.ground_effect_controller.get_throttle());
         plane.nav_pitch_cd = plane.g2.ground_effect_controller.get_pitch();
         plane.calc_nav_roll();
