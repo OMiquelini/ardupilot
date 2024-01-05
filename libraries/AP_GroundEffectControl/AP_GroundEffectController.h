@@ -51,6 +51,10 @@ public:
 
     void land_seq(float alt_error, float airspeed_error, float reading);
 
+    bool obstacle_detect();
+
+    void obstacle_avoid();
+
     float alt_adjust=0;
 
     float spd_aimed=0;

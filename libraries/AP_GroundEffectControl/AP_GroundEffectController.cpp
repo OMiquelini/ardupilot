@@ -127,10 +127,10 @@ const AP_Param::GroupInfo GroundEffectController::var_info[] = {
     AP_GROUPINFO("_FLARE_ANG", 16, GroundEffectController, _FLARE_ANG, 6.5),
 
     //DECREMENTO DA ALTITUDE ALVO POR LOOP DA LAND_SEQ
-    AP_GROUPINFO("_ALT_AUX", 17, GroundEffectController, _ALT_AUX, 0.005),
+    AP_GROUPINFO("_ALT_AUX", 17, GroundEffectController, _ALT_AUX, 0.25),
 
     //DECREMENTO DA VELOCIDADE ALVO POR LOOP DA LAND_SEQ
-    AP_GROUPINFO("_SPD_AUX", 18, GroundEffectController, _SPD_AUX, 0.02),
+    AP_GROUPINFO("_SPD_AUX", 18, GroundEffectController, _SPD_AUX, 1),
 
     AP_GROUPINFO("_MIN_LAND", 19, GroundEffectController, _MIN_LAND, 0.15),
 
@@ -230,8 +230,8 @@ void GroundEffectController::land_seq(float alt_error, float airspeed_error, flo
     }
     else if(reading >=_MIN_LAND && reading <=_MAX_LAND)//caso a altitude esteja entre 15 cm e 1 m, começa sequencia de pouso, diminuindo a altitude e velocidade alvo gradativamente
     {
-        alt_error_aux+=_ALT_AUX;//para cada iteração da função land_seq, a altitude alvo é diminuida em 0,5 cm, assim, totalizando 0,25 m/s
-        spd_error_aux+=_SPD_AUX;//para cada iteração da função, a velocidade alvo é diminuida em 0,02 m, totalizando 1m/s
+        alt_error_aux+=(_ALT_AUX/50);//para cada iteração da função land_seq, a altitude alvo é diminuida em 0,5 cm, assim, totalizando 0,25 m/s
+        spd_error_aux+=(_SPD_AUX/50);//para cada iteração da função, a velocidade alvo é diminuida em 0,02 m, totalizando 1m/s
         _pitch=_pitch_pid.get_pid(alt_error-alt_error_aux);
         _throttle = _throttle_pid.get_pid(airspeed_error+spd_error_aux);
         _throttle = constrain_int16(_throttle, _THR_MIN, _THR_MAX);
@@ -245,6 +245,11 @@ void GroundEffectController::land_seq(float alt_error, float airspeed_error, flo
     }
     
     return;
+}
+
+bool GroundEffectController::obstacle_detect()
+{
+    return false;
 }
 
 void GroundEffectController::update(bool land)
@@ -286,8 +291,12 @@ void GroundEffectController::update(bool land)
         alt_error = _ALT_REF + alt_adjust - reading;
     }
 
+    if(obstacle_detect())
+    {
+        obstacle_avoid();
+    }
     //update pitch and throttle, land or cruise
-    if(!land) {
+    else if(!land) {
         //takeoff and cruise
         cruise(alt_error, airspeed_error, reading);
     } else {
